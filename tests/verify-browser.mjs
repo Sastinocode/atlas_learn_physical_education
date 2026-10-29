@@ -66,6 +66,9 @@ for(const vp of viewports){
   await chip.click();
   await page.waitForTimeout(700);
   if(await chip.getAttribute('data-active')===null)fail(where,'el modo no queda activo al pulsarlo');
+  if(name==='Lecciones'){
+   try{await page.locator('.lesson-stage .mannequin canvas').first().waitFor({timeout:20000});}catch{fail(where,'no aparece el maniquí 3D de planos y ejes');}
+  }
   if(name==='Atlas 3D'){
    if(!loaded3d)fail(where,'no se ha pedido atlas3d.js');
    try{await page.locator('main canvas').first().waitFor({timeout:30000});}catch{fail(where,'no aparece el visor 3D (canvas)');}
@@ -99,4 +102,4 @@ for(const vp of viewports){
 await browser.close();
 server.close();
 if(failures.length){console.error(`\nFALLO: ${failures.length} problema(s) en el navegador.`);process.exit(1);}
-console.log('PASS navegador: 11 modos en escritorio y móvil sin errores (el 3D solo se carga al entrar), y guardado/recuperación de progreso.');
+console.log('PASS navegador: 11 modos en escritorio y móvil sin errores (maniquí en Lecciones; el 3D anatómico solo se carga al entrar), y guardado/recuperación de progreso.');

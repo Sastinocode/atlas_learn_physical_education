@@ -8,6 +8,8 @@ export const planeDefinitions:Record<PlaneId,{name:string;division:string;axis:s
  sagittal:{name:'Sagital',division:'Separa una parte derecha y otra izquierda. Solo el plano medio divide en mitades.',axis:'Mediolateral (transversal)',direction:'De un lado al otro.',normal:[1,0,0],u:[0,0,1],v:[0,1,0]},
  transverse:{name:'Transversal u horizontal',division:'Separa una parte superior y otra inferior.',axis:'Longitudinal',direction:'A lo largo del húmero o del fémur; vertical en esta postura.',normal:[0,1,0],u:[1,0,0],v:[0,0,1]}
 };
+// Movimiento que enseña el maniquí para cada plano (coincide con los ejemplos de la lección)
+export const planeDemos:Record<'sagital'|'frontal'|'transversal',{joint:JointId;motion:MotionId}>={sagital:{joint:'hip',motion:'flex'},frontal:{joint:'shoulder',motion:'abd'},transversal:{joint:'hip',motion:'er'}};
 export const jointNames:Record<JointId,string>={hip:'Cadera',shoulder:'Hombro'};
 export const planeMotions:{id:MotionId;name:string;short:string;plane:PlaneId;from:number;to:number;description:string}[]=[
  {id:'abd',name:'Abducción',short:'ABD',plane:'frontal',from:0,to:45,description:'Separar el segmento de la línea media por el lateral.'},

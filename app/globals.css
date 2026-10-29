@@ -111,3 +111,20 @@ h1 em,.brand-dot{font-style:italic}
 button:focus-visible,a:focus-visible,textarea:focus-visible,select:focus-visible{outline-color:var(--c-transversal)}
 input[type="checkbox"],input[type="radio"],input[type="range"]{accent-color:var(--primary)}
 @media(max-width:600px){.brand small{white-space:nowrap;letter-spacing:1px}}
+
+/* ===== Maniquí 3D (planos, ejes y movimientos) ===== */
+.mannequin{margin:10px 0;position:relative}
+.mannequin-stage{position:relative;width:100%;aspect-ratio:4/3;border:1px solid var(--border);border-radius:12px;overflow:hidden;background:#f8f3e9;touch-action:none}
+.mannequin.compact .mannequin-stage{aspect-ratio:16/10;max-width:520px;margin:auto}
+.mannequin-stage canvas{display:block;width:100%!important;height:100%!important;cursor:grab}
+.mannequin-stage canvas:active{cursor:grabbing}
+.mannequin-angle{position:absolute;left:0;top:0;font-family:var(--font-serif);font-weight:600;font-size:1.25rem;background:#fffdf8e6;border-radius:6px;padding:0 6px;pointer-events:none;white-space:nowrap}
+.mannequin-legend{display:flex;flex-wrap:wrap;gap:6px 16px;margin-top:8px;font-size:.85rem;color:var(--ink-soft)}
+.mannequin-legend span{display:inline-flex;align-items:center;gap:6px}
+.mannequin-legend i{display:inline-block;width:14px;height:14px;border-radius:3px;opacity:.75}
+.mannequin-legend i.axis{height:3px;width:18px;background:var(--ink);opacity:1}
+.mannequin-legend i.moving{background:#b9775a;border-radius:50%}
+.mannequin.loading{position:relative}
+.mannequin-loading{position:absolute;top:10px;left:50%;transform:translateX(-50%);font-size:.85rem;color:var(--ink-soft);background:#fffdf8;border:1px solid var(--border);border-radius:20px;padding:4px 12px}
+.lesson-stage{max-width:760px;margin:18px auto 6px}
+.plane-chip{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:8px;vertical-align:middle;opacity:.8}
