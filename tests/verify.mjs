@@ -98,3 +98,33 @@ for(const id of ['squat','lunge'])for(let i=0;i<=20;i++){
 const deep=ep.rearLeg(ep.hipFromAnkle(ep.LUNGE_FRONT_ANKLE,ep.flatLeg(ep.anglesAt('lunge',0)).s,ep.flatLeg(ep.anglesAt('lunge',0)).t),ep.LUNGE_REAR_BALL,90);
 assert.ok(near(deep.kneeFlex,90,1),'Zancada baja: rodilla trasera a unos 90°');
 console.log('PASS: ejercicios en el maniquí (sentadilla, zancada y press): poses validadas, pie plano, apoyo trasero en el suelo y alcance de la pierna.');
+
+// Exportación de resultados de clase (CSV para Excel)
+const ce=moduleFrom('app/class-export.ts');
+assert.equal(ce.csvCell('Cuádriceps'),'Cuádriceps','Las tildes se conservan');
+assert.equal(ce.csvCell('a;b'),'"a;b"');assert.equal(ce.csvCell('dice "hola"'),'"dice ""hola"""');assert.equal(ce.csvCell('línea 1\nlínea 2'),'"línea 1\nlínea 2"');
+assert.equal(ce.csvCell('=SUMA(A1)'),"'=SUMA(A1)",'Lo que parece una fórmula no se ejecuta en Excel');
+const rel=c.questions.find(q=>q.mode==='relacionar'),loc=c.questions.find(q=>q.mode==='localizar'),exp=c.questions.find(q=>q.mode==='explicar');
+const at='2026-10-29T10:15:00.000Z',wrongOpt=(rel.correct+1)%rel.options.length;
+const sx={...m.fresh(),results:{
+ [`0:${rel.id}`]:{...m.emptyResult(),done:true,points:2,tries:1,answer:String(rel.correct),at},
+ [`1:${rel.id}`]:{...m.emptyResult(),done:true,points:2,tries:2,everWrong:true,answer:String(rel.correct),at},
+ [`2:${rel.id}`]:{...m.emptyResult(),done:true,points:0,tries:1,revealed:true,layers:['muscles'],answer:String(rel.correct)},
+ [`solo:${loc.id}`]:{...m.emptyResult(),done:true,points:0,tries:1,everWrong:true,answer:'femur'},
+ [`0:${exp.id}`]:{...m.emptyResult(),done:true,points:1,tries:1,answer:'Porque; el "cuádriceps" frena',at},
+ [`1:${loc.id}`]:{...m.emptyResult(),done:false}
+}};
+const csv=ce.classCsv(sx,c.questions,c.structures,['Órbita','Vector','Impulso'],[{game:'Juego 10',profile:'Participante 01',points:700,status:'Completada (10/10)',at:Date.parse(at)}]);
+assert.ok(csv.startsWith('\uFEFF'),'UTF-8 con BOM para que Excel lea bien las tildes');
+const lines=csv.slice(1).trim().split('\r\n');
+assert.equal(lines[0],ce.CSV_HEADER.join(';'));assert.equal(ce.CSV_HEADER.length,10);
+assert.equal(lines.length,1+5+1,'Cabecera, 5 respuestas hechas (la no terminada se omite) y 1 partida');
+assert.ok(csv.includes('Equipo Órbita;Relacionar')&&csv.includes(';Correcta;2;1;'));
+assert.ok(csv.includes(';Correcta tras fallar;2;2;'));
+assert.ok(csv.includes(';Correcta con ayudas (sin puntos);0;1;muscles;'));
+assert.ok(csv.includes('Individual;Localizar')&&csv.includes(';Incorrecta;0;1;;Fémur;'),'Localizar muestra el nombre de la estructura elegida');
+assert.ok(csv.includes(';Valorada 1/2;')&&csv.includes('"Porque; el ""cuádriceps"" frena"'),'Justificación de Explicar con comillas y ;');
+assert.ok(csv.includes('Participante 01;Juego 10;;;Completada (10/10);700;'));
+assert.ok(ce.formatDate(at)&&/26/.test(ce.formatDate(at))&&csv.includes(ce.formatDate(at)),'Fecha y hora legibles');
+assert.equal(ce.formatDate(undefined),'');
+console.log('PASS: exportación CSV para Excel: BOM, separador ;, comillas, acentos, fórmulas neutralizadas, resultados por equipo, Explicar y partidas.');

@@ -116,6 +116,27 @@ for(const vp of viewports){
   }else{await page.keyboard.press('Escape');await page.waitForTimeout(300);}
  }
 
+ // Repaso rápido y exportación de resultados (CSV para Excel)
+ where=`${vp.name} · repaso rápido`;
+ await page.locator('.mode-nav .mode-chip',{hasText:'Relacionar'}).click();
+ await page.getByRole('radio').first().click();
+ await page.getByRole('button',{name:/Comprobar respuesta/}).click();
+ await page.getByRole('button',{name:'Profesor'}).click();
+ await page.getByRole('button',{name:/Repaso rápido/}).click();
+ for(let i=0;i<10;i++){await page.getByRole('button',{name:'Mostrar respuesta'}).click();await page.getByRole('button',{name:/La clase (acierta|falla)/}).nth(i%2).click();}
+ const summary=await page.locator('.review-summary').innerText().catch(()=>'');
+ if(!/5\s*de 10 acertadas/.test(summary))fail(where,'el resumen del repaso no muestra 5 de 10');else console.log(`  ✓ ${where} · 5 de 10`);
+ await page.getByRole('button',{name:'Cerrar'}).last().click();
+ where=`${vp.name} · exportar resultados`;
+ await page.getByRole('button',{name:'Profesor'}).click();
+ const [csvFile]=await Promise.all([page.waitForEvent('download'),page.getByRole('button',{name:/Exportar resultados/}).click()]);
+ const csvDir=await mkdtemp(join(tmpdir(),'atlas-csv-'));const csvPath=join(csvDir,'r.csv');await csvFile.saveAs(csvPath);
+ const csvText=await readFile(csvPath,'utf8');await rm(csvDir,{recursive:true,force:true});
+ if(!csvText.startsWith('\uFEFFEquipo o perfil;Actividad;Tema'))fail(where,'el archivo no empieza con la cabecera esperada y BOM');
+ else if(!csvText.includes(';Relacionar;'))fail(where,'el archivo no incluye la respuesta de Relacionar');
+ else console.log(`  ✓ ${where} · ${csvFile.suggestedFilename()}`);
+ await page.keyboard.press('Escape');await page.waitForTimeout(300);
+
  // Guardar y recuperar progreso
  where=`${vp.name} · guardar y recuperar progreso`;
  await page.evaluate(()=>localStorage.setItem('cuerpo-prueba-navegador','ok'));
@@ -138,4 +159,4 @@ for(const vp of viewports){
 await browser.close();
 server.close();
 if(failures.length){console.error(`\nFALLO: ${failures.length} problema(s) en el navegador.`);process.exit(1);}
-console.log('PASS navegador: 11 modos, laboratorio de codo, rodilla y tobillo, y ejercicios en 3D en escritorio y móvil sin errores (maniquí en Lecciones y Core; el 3D anatómico solo se carga al entrar), y guardado/recuperación de progreso.');
+console.log('PASS navegador: 11 modos, laboratorio de codo, rodilla y tobillo, ejercicios en 3D, repaso rápido y exportación a Excel en escritorio y móvil sin errores (maniquí en Lecciones y Core; el 3D anatómico solo se carga al entrar), y guardado/recuperación de progreso.');
