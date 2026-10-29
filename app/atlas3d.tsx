@@ -12,10 +12,10 @@ const atlas=model as unknown as Atlas;
 const initial=():SceneState=>({visible:['skeletal','muscular','connective'],selected:[],isolate:false,explode:0,view:'front',rotate:false,reset:0,offset:[0,0,0],opacity:{skeletal:1,muscular:1,connective:1},lightweight:false});
 const layerNames={skeletal:'Huesos',muscular:'Músculos',connective:'Tendón calcáneo'};
 const related:Record<string,string[]>={pectoral:['r4','e4'],deltoid:['r6','e6'],biceps:['r5','e5'],triceps:['r4'],glute:['r2','m4'],glutemed:['m1','m3','m9'],quad:['r1'],hamstrings:['m9'],gastro:['r3'],soleus:['e3'],tibant:['m2','m10'],achilles:['m5','m8'],coxal:['m7','m9'],femur:['m9']};
-export default function Atlas3D({onQuestion}:{onQuestion:(id:string)=>void}){
+export default function Atlas3D({onQuestion,focusId}:{onQuestion:(id:string)=>void;focusId?:string}){
  const [state,setState]=useState<SceneState>(initial),[history,setHistory]=useState<SceneState[]>([]);
  const [progress,setProgress]=useState(0),[error,setError]=useState(''),[ready,setReady]=useState(false),[saveError,setSaveError]=useState(false);
- const [query,setQuery]=useState(''),[retry,setRetry]=useState(0),[focus,setFocus]=useState(false);
+ const [query,setQuery]=useState(''),[retry,setRetry]=useState(0),[focus,setFocus]=useState(false),[showNames,setShowNames]=useState(false);
  useEffect(()=>{const exit=(e:KeyboardEvent)=>{if(e.key==='Escape')setFocus(false);};window.addEventListener('keydown',exit);return()=>window.removeEventListener('keydown',exit);},[]);
  const guide=model.learning.find(c=>c.elements.some(id=>state.selected.includes(id)));
  const selected=atlas.parts.find(p=>state.selected.includes(p.id));
@@ -27,7 +27,12 @@ export default function Atlas3D({onQuestion}:{onQuestion:(id:string)=>void}){
   if(typeof DecompressionStream==='undefined')setError('Este navegador no admite la carga comprimida. Usa una versión actual de Edge, Chrome o Firefox, o continúa con el atlas 2D.');
   try{const raw=JSON.parse(localStorage.getItem(THREE_STORAGE)||'null');
    if(raw&&Array.isArray(raw.visible)&&raw.visible.every((x:string)=>Object.hasOwn(layerNames,x))&&Array.isArray(raw.selected)&&raw.selected.every((id:string)=>atlas.parts.some(p=>p.id===id))&&['front','back','side','three-quarter'].includes(raw.view)&&typeof raw.isolate==='boolean'&&typeof raw.rotate==='boolean'&&Number.isFinite(raw.explode)&&raw.explode>=0&&raw.explode<=1&&Array.isArray(raw.offset)&&raw.offset.length===3&&raw.offset.every((n:number)=>Number.isFinite(n)&&Math.abs(n)<=.6))setState({...initial(),...raw,opacity:Object.fromEntries(Object.keys(layerNames).map(id=>[id,opacityFor(raw.opacity,id as SystemId)])),lightweight:raw.lightweight===true,rotate:false,reset:0});
-  }catch{setSaveError(true);}setReady(true);
+  }catch{setSaveError(true);}
+  // Abierto desde «Ver en 3D» de Explorar: selecciona esa ficha con las tres capas visibles
+  const target=model.learning.find(c=>c.id===focusId);
+  if(target)setState(s=>({...s,visible:['skeletal','muscular','connective'],opacity:{skeletal:1,muscular:1,connective:1},selected:target.elements,isolate:false,explode:0,offset:[0,0,0],rotate:false,reset:s.reset+1}));
+  setReady(true);
+ // eslint-disable-next-line react-hooks/exhaustive-deps
  },[]);
  useEffect(()=>{if(ready)try{localStorage.setItem(THREE_STORAGE,JSON.stringify(state));}catch{setSaveError(true);}},[ready,state]);
  function commit(next:SceneState){setHistory(h=>[...h.slice(-19),state]);setState(next);}
@@ -36,7 +41,7 @@ export default function Atlas3D({onQuestion}:{onQuestion:(id:string)=>void}){
  const scope='Selección docente de 25 estructuras o grupos, con 313 mallas incluidas las piezas óseas de contexto. Referencia corporal adulta masculina; no representa todas las anatomías.';
  return <section className={`atlas3d ${focus?'three-focus':''}`} id="workspace" aria-label="Atlas anatómico en tres dimensiones">
   <div className="workshop-heading"><div><div className="eyebrow">HUMAN ATLAS · BODYPARTS3D · SELECCIÓN TSEAS</div><h2>Explora el cuerpo en 3D</h2><p>Selecciona, aísla y desplaza estructuras anatómicas reales del modelo.</p></div><button className="secondary" onClick={()=>commit({...initial(),reset:state.reset+1})}>Reiniciar vista 3D</button></div>
-  <div className="three-tools" aria-label="Opciones del visor"><button className="secondary" aria-pressed={focus} onClick={()=>setFocus(!focus)}>{focus?'Mostrar fichas y controles':'Modo proyector · ampliar modelo'}</button><button className="secondary" aria-pressed={!!state.lightweight} onClick={()=>commit({...state,lightweight:!state.lightweight})}>{state.lightweight?'✓ Modo ligero activado':'Modo ligero para equipos lentos'}</button><button className="secondary" onClick={()=>commit({...state,visible:['skeletal','muscular','connective'],opacity:{skeletal:1,muscular:.2,connective:1}})}>Ver huesos bajo músculos</button><button className="secondary" onClick={()=>commit({...state,opacity:{skeletal:1,muscular:1,connective:1}})}>Restaurar opacidad</button></div>
+  <div className="three-tools" aria-label="Opciones del visor"><button className="secondary" aria-pressed={focus} onClick={()=>setFocus(!focus)}>{focus?'Mostrar fichas y controles':'Modo proyector · ampliar modelo'}</button><button className="secondary" aria-pressed={!!state.lightweight} onClick={()=>commit({...state,lightweight:!state.lightweight})}>{state.lightweight?'✓ Modo ligero activado':'Modo ligero para equipos lentos'}</button><button className="secondary" onClick={()=>commit({...state,visible:['skeletal','muscular','connective'],opacity:{skeletal:1,muscular:.2,connective:1}})}>Ver huesos bajo músculos</button><button className="secondary" onClick={()=>commit({...state,opacity:{skeletal:1,muscular:1,connective:1}})}>Restaurar opacidad</button><button className="secondary" aria-pressed={showNames} onClick={()=>setShowNames(v=>!v)}>{showNames?'✓ Nombres sobre el modelo':'Mostrar nombres sobre el modelo'}</button></div>
   {focus&&<p className="small-note">Modo proyector: selecciona sobre el modelo. Pulsa Escape o «Mostrar fichas y controles» para volver.</p>}
   <div className="three-grid">
    <aside className="three-library"><h3>Capas visibles</h3>{Object.entries(layerNames).map(([id,name])=><label className="three-check" key={id}><input type="checkbox" checked={state.visible.includes(id as SystemId)} onChange={()=>commit({...state,selected:[],isolate:false,offset:[0,0,0],visible:state.visible.includes(id as SystemId)?state.visible.filter(x=>x!==id):[...state.visible,id as SystemId]})}/>{name}</label>)}
@@ -45,7 +50,7 @@ export default function Atlas3D({onQuestion}:{onQuestion:(id:string)=>void}){
     <nav className="three-list" aria-label="Estructuras 3D">{available.map(c=><button key={c.id} className={guide?.id===c.id?'selected':''} aria-pressed={guide?.id===c.id} onClick={()=>select(c.id)}>{c.name}<small>{c.elements.length} piezas del modelo</small></button>)}{!available.length&&<p>No hay coincidencias en la selección docente.</p>}</nav>
    </aside>
    <div className="three-center"><div className="three-views" aria-label="Vistas del modelo">{(['front','back','side','three-quarter'] as View[]).map((v,i)=><button className="secondary" key={v} aria-pressed={state.view===v} onClick={()=>commit({...state,view:v,explode:0,reset:state.reset+1,rotate:false})}>{['Anterior','Posterior','Lateral','Oblicua'][i]}</button>)}</div>
-    <div className="three-canvas">{ready&&!error&&<AnatomyScene key={retry} atlas={atlas} state={state} onSelect={select} onProgress={setProgress} onError={setError}/>}
+    <div className="three-canvas">{ready&&!error&&<AnatomyScene key={retry} atlas={atlas} state={state} onSelect={select} onProgress={setProgress} onError={setError} label={guide?.name||selected?.name} labels={showNames?model.learning:null}/>}
      {progress<100&&!error&&<p className="three-loading" role="status">Preparando modelo 3D… {progress}%</p>}
      {error&&<div className="three-loading" role="alert"><p>{error}</p><button className="secondary" onClick={()=>{setError('');setProgress(0);setRetry(n=>n+1);}}>Reintentar carga</button><p>El atlas 2D y los retos siguen disponibles en las pestañas superiores.</p></div>}
     </div>

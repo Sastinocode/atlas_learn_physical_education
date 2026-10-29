@@ -128,3 +128,24 @@ input[type="checkbox"],input[type="radio"],input[type="range"]{accent-color:var(
 .mannequin-loading{position:absolute;top:10px;left:50%;transform:translateX(-50%);font-size:.85rem;color:var(--ink-soft);background:#fffdf8;border:1px solid var(--border);border-radius:20px;padding:4px 12px}
 .lesson-stage{max-width:760px;margin:18px auto 6px}
 .plane-chip{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:8px;vertical-align:middle;opacity:.8}
+
+/* ===== Visor anatómico 3D: lámina ===== */
+@media(min-width:1151px){.three-grid{grid-template-columns:190px minmax(360px,1fr) 270px}}
+.three-canvas{height:clamp(500px,74vh,760px);background:#f6f0e4;border-color:var(--border)}
+.part-leader{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:2;overflow:visible}
+.part-leader line{stroke:var(--ink);stroke-width:1.5}
+.part-leader circle{fill:#fffdf8;stroke:var(--ink);stroke-width:2}
+.part-label{position:absolute;left:0;top:0;z-index:3;pointer-events:none;font-family:var(--font-serif);font-weight:600;font-size:1.05rem;color:var(--ink);background:#fffdf8f0;border:1px solid var(--ink);border-radius:4px;padding:3px 10px;white-space:nowrap;box-shadow:0 2px 6px #2b241d22}
+.part-names{position:absolute;inset:0;pointer-events:none;z-index:1}
+.part-names span{position:absolute;left:0;top:0;font-size:.78rem;font-weight:600;color:var(--ink);background:#fffdf8d9;border-radius:3px;padding:1px 5px;white-space:nowrap}
+.part-hover{background:#fffdf8;border-color:var(--ink)}
+@media(max-width:600px){.three-canvas{height:62vh}.part-label{font-size:.9rem}}
+.part-label.behind{border-style:dashed;color:var(--ink-soft)}
+.part-leader.behind line{stroke-dasharray:4 3}
+@media(max-width:650px){
+ .atlas3d .workshop-heading{flex-direction:row;align-items:flex-start;gap:10px}
+ .atlas3d .workshop-heading p{display:none}
+ .three-tools{display:flex;flex-wrap:nowrap;overflow-x:auto;gap:6px;padding-bottom:4px;scrollbar-width:thin}
+ .three-tools button{flex:0 0 auto;font-size:.85rem;padding:8px 12px}
+ .atlas3d .three-library{order:2}.atlas3d .three-center{order:1}.atlas3d .three-detail{order:3}
+}

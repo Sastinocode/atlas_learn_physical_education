@@ -1,7 +1,7 @@
 'use client';
 import {useEffect,useState,type ComponentType} from 'react';
 
-type Atlas3DProps={onQuestion:(id:string)=>void};
+type Atlas3DProps={onQuestion:(id:string)=>void;focusId?:string};
 type Loaded={__atlas3d?:{default:ComponentType<Atlas3DProps>}};
 
 // El 3D (modelo y Three.js) va en atlas3d.js y se descarga al entrar en este modo.

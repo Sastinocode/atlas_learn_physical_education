@@ -2,6 +2,8 @@ import {readFileSync} from 'node:fs';
 import {gunzipSync} from 'node:zlib';
 import assert from 'node:assert/strict';
 const m=JSON.parse(readFileSync('app/three/model.json','utf8'));
+// La lista fija de app/three-ids.ts (botón «Ver en 3D» de Explorar) debe coincidir con las fichas del modelo
+assert.deepEqual(JSON.parse(readFileSync('app/three-ids.ts','utf8').match(/new Set\((\[.*\])\)/)[1]).sort(),m.learning.map(l=>l.id).sort(),'app/three-ids.ts no coincide con las fichas del modelo 3D');
 assert.equal(m.learning.length,25);
 assert.equal(m.parts.length,313);
 assert.equal(new Set(m.parts.map(p=>p.id)).size,m.parts.length);
