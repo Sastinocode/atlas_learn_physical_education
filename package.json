@@ -17,6 +17,7 @@
     "aula:local": "node scripts/classroom-server.mjs",
     "build:pages": "node build-offline.mjs",
     "preview:pages": "node scripts/preview-static.mjs",
+    "test:browser": "node tests/verify-browser.mjs",
     "check": "tsc --noEmit && node tests/verify-challenges.mjs && node tests/verify-display-options.mjs && node tests/verify-3d.mjs"
   },
   "dependencies": {
@@ -48,6 +49,7 @@
     "oxfmt": "0.61.0",
     "oxlint": "1.76.0",
     "oxlint-tsgolint": "7.0.2001",
+    "playwright-core": "^1.64.1",
     "tailwindcss": "4.2.1",
     "typescript": "5.9.3",
     "vite": "8.0.13",
