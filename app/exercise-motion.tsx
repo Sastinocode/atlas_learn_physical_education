@@ -44,27 +44,27 @@ export default function ExerciseMotion({id,amount,joint,forces,phaseLabel}:{id:s
  const centre=point(p.hip,p.shoulder,.4);
  function arrow(a:P,b:P,label:string,color:string){return <g><path d={`M${a} L${b}`} stroke={color} strokeWidth="3" markerEnd={`url(#${uid}-${color.slice(1)})`}/><text x={b[0]+8} y={b[1]+4} fill={color}>{label}</text></g>;}
  return <svg className="motion-svg" viewBox="0 0 480 440" role="img" aria-label={`${phaseLabel}. Esquema ${id==='press'?'frontal proyectado':'lateral'}; articulación analizada: ${joint.name}. ${forces?'Flechas de fuerzas externas cualitativas, sin escala.':''}`}>
-  <defs>{['#b04b35','#23796e','#6d46ac'].map(c=><marker id={`${uid}-${c.slice(1)}`} key={c} markerWidth="7" markerHeight="7" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6" fill={c}/></marker>)}</defs>
+  <defs>{['#b04b35','#23796e','#744f3a'].map(c=><marker id={`${uid}-${c.slice(1)}`} key={c} markerWidth="7" markerHeight="7" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6" fill={c}/></marker>)}</defs>
   <text x="22" y="28" className="motion-view">{id==='press'?'PROYECCIÓN FRONTAL':'VISTA LATERAL · ESQUEMA'}</text>
-  <path d="M65 382 H407" stroke="#c9c1d6" strokeWidth="2"/>
-  {(id==='press'||id==='row')&&<path d={id==='row'?'M146 278 H221 M155 278 V377':'M196 276 H279 M201 276 V377 M197 276 V166'} stroke="#bab3c7" strokeWidth="8" fill="none"/>}
-  {id==='row'&&<><path d={`M${p.hand} L427 206`} stroke="#8a7bab" strokeWidth="2"/><circle cx="433" cy="206" r="10" fill="none" stroke="#8a7bab"/><path d="M320 355 L356 323" stroke="#bab3c7" strokeWidth="7"/></>}
-  {id==='calf'&&<path d="M340 80 V378" stroke="#bab3c7" strokeWidth="5"/>}
-  {p.rear&&<polyline points={path(p.rear)} fill="none" stroke="#a9a1b6" strokeWidth="15" strokeLinecap="round" strokeLinejoin="round"/>}
-  {id==='press'&&<><polyline points={path([p.hip,[470-p.knee[0],p.knee[1]],[470-p.ankle[0],p.ankle[1]],[470-p.toe[0],p.toe[1]]])} fill="none" stroke="#8b7c97" strokeWidth="18" strokeLinecap="round" strokeLinejoin="round"/><path d="M212 165 H258" stroke="#665871" strokeWidth="18" strokeLinecap="round"/></>}
-  <polyline points={path([p.toe,p.ankle,p.knee,p.hip,id==='press'?[235,165]:p.shoulder])} fill="none" stroke="#665871" strokeWidth="18" strokeLinecap="round" strokeLinejoin="round"/>
-  <polyline points={path([p.shoulder,p.elbow,p.hand])} fill="none" stroke="#665871" strokeWidth="13" strokeLinecap="round" strokeLinejoin="round"/>
-  {p.left&&<polyline points={path(p.left)} fill="none" stroke="#8b7c97" strokeWidth="13" strokeLinecap="round" strokeLinejoin="round"/>}
-  <circle cx={p.head[0]} cy={p.head[1]} r="19" fill="#d8c8e8" stroke="#665871" strokeWidth="3"/>
+  <path d="M65 382 H407" stroke="#d3ccc4" strokeWidth="2"/>
+  {(id==='press'||id==='row')&&<path d={id==='row'?'M146 278 H221 M155 278 V377':'M196 276 H279 M201 276 V377 M197 276 V166'} stroke="#c4bdb6" strokeWidth="8" fill="none"/>}
+  {id==='row'&&<><path d={`M${p.hand} L427 206`} stroke="#7d6557" strokeWidth="2"/><circle cx="433" cy="206" r="10" fill="none" stroke="#7d6557"/><path d="M320 355 L356 323" stroke="#c4bdb6" strokeWidth="7"/></>}
+  {id==='calf'&&<path d="M340 80 V378" stroke="#c4bdb6" strokeWidth="5"/>}
+  {p.rear&&<polyline points={path(p.rear)} fill="none" stroke="#b9ae9e" strokeWidth="15" strokeLinecap="round" strokeLinejoin="round"/>}
+  {id==='press'&&<><polyline points={path([p.hip,[470-p.knee[0],p.knee[1]],[470-p.ankle[0],p.ankle[1]],[470-p.toe[0],p.toe[1]]])} fill="none" stroke="#9c8d77" strokeWidth="18" strokeLinecap="round" strokeLinejoin="round"/><path d="M212 165 H258" stroke="#756854" strokeWidth="18" strokeLinecap="round"/></>}
+  <polyline points={path([p.toe,p.ankle,p.knee,p.hip,id==='press'?[235,165]:p.shoulder])} fill="none" stroke="#756854" strokeWidth="18" strokeLinecap="round" strokeLinejoin="round"/>
+  <polyline points={path([p.shoulder,p.elbow,p.hand])} fill="none" stroke="#756854" strokeWidth="13" strokeLinecap="round" strokeLinejoin="round"/>
+  {p.left&&<polyline points={path(p.left)} fill="none" stroke="#9c8d77" strokeWidth="13" strokeLinecap="round" strokeLinejoin="round"/>}
+  <circle cx={p.head[0]} cy={p.head[1]} r="19" fill="#e3d9cd" stroke="#756854" strokeWidth="3"/>
   {[p.hip,p.knee,p.ankle,p.shoulder,p.elbow].map((v,i)=><circle key={i} cx={v[0]} cy={v[1]} r="5" fill="white"/>)}
-  {id==='press'&&[p.hand,p.left![2]].map((h,i)=><g key={i}><path d={`M${h[0]-18} ${h[1]} H${h[0]+18}`} stroke="#3e344a" strokeWidth="6"/><path d={`M${h[0]-18} ${h[1]-9} V${h[1]+9} M${h[0]+18} ${h[1]-9} V${h[1]+9}`} stroke="#3e344a" strokeWidth="9"/></g>)}
-  <circle cx={j[0]} cy={j[1]} r="15" fill="none" stroke="#6d46ac" strokeWidth="3" strokeDasharray="4 3"/>
-  <path d={`M${j} L${Math.min(398,j[0]+70)} ${j[1]-27}`} stroke="#6d46ac" strokeWidth="1.5"/>
-  <text x={Math.min(330,j[0]+45)} y={j[1]-33} fill="#583586">① {joint.name}</text>
-  {id==='lunge'&&<text x="249" y="410" fill="#665871">Pierna adelantada</text>}
+  {id==='press'&&[p.hand,p.left![2]].map((h,i)=><g key={i}><path d={`M${h[0]-18} ${h[1]} H${h[0]+18}`} stroke="#342c27" strokeWidth="6"/><path d={`M${h[0]-18} ${h[1]-9} V${h[1]+9} M${h[0]+18} ${h[1]-9} V${h[1]+9}`} stroke="#342c27" strokeWidth="9"/></g>)}
+  <circle cx={j[0]} cy={j[1]} r="15" fill="none" stroke="#744f3a" strokeWidth="3" strokeDasharray="4 3"/>
+  <path d={`M${j} L${Math.min(398,j[0]+70)} ${j[1]-27}`} stroke="#744f3a" strokeWidth="1.5"/>
+  <text x={Math.min(330,j[0]+45)} y={j[1]-33} fill="#5b3d2c">① {joint.name}</text>
+  {id==='lunge'&&<text x="249" y="410" fill="#756854">Pierna adelantada</text>}
   {forces&&<>
    {arrow([centre[0]-28,centre[1]],[centre[0]-28,centre[1]+65],'P','#b04b35')}
-   {id==='row'?<>{arrow(p.hand,[p.hand[0]+70,p.hand[1]+(206-p.hand[1])*.35],'T','#6d46ac')}{arrow([181,285],[181,234],'R','#23796e')}{arrow([327,347],[303,323],'R','#23796e')}</>:id==='press'?<>{[p.hand,p.left![2]].map((h,i)=><g key={i}>{arrow([h[0]+12,h[1]+5],[h[0]+12,h[1]+60],'Pₘ','#b04b35')}</g>)}{arrow([245,282],[245,228],'R','#23796e')}{arrow([p.toe[0],375],[p.toe[0],325],'R','#23796e')}</>:<>{arrow([p.toe[0],377],[p.toe[0],315],'R','#23796e')}{id==='pushup'&&arrow([p.hand[0]+7,377],[p.hand[0]+7,315],'R','#23796e')}{id==='lunge'&&arrow([145,377],[145,325],'R','#23796e')}</>}
+   {id==='row'?<>{arrow(p.hand,[p.hand[0]+70,p.hand[1]+(206-p.hand[1])*.35],'T','#744f3a')}{arrow([181,285],[181,234],'R','#23796e')}{arrow([327,347],[303,323],'R','#23796e')}</>:id==='press'?<>{[p.hand,p.left![2]].map((h,i)=><g key={i}>{arrow([h[0]+12,h[1]+5],[h[0]+12,h[1]+60],'Pₘ','#b04b35')}</g>)}{arrow([245,282],[245,228],'R','#23796e')}{arrow([p.toe[0],375],[p.toe[0],325],'R','#23796e')}</>:<>{arrow([p.toe[0],377],[p.toe[0],315],'R','#23796e')}{id==='pushup'&&arrow([p.hand[0]+7,377],[p.hand[0]+7,315],'R','#23796e')}{id==='lunge'&&arrow([145,377],[145,325],'R','#23796e')}</>}
   </>}
   <text x="22" y="434" className="motion-view">POSICIONES ORIENTATIVAS · SIN MEDICIÓN DE ÁNGULOS</text>
  </svg>;

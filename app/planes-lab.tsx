@@ -20,17 +20,17 @@ function PlaneScene({joint,motion,progress,camera,planeVisible,axisVisible}:{joi
  const anterior=project([0,0,95]),origin=project([0,0,0]);
  return <svg className="plane-scene" viewBox="0 0 560 480" role="img" aria-label={`${jointNames[joint]} derecha: ${m.name}. Vista ${camera==='front'?'frontal':camera==='side'?'lateral':camera==='top'?'superior':'oblicua'}. ${planeVisible?'Superficie P: plano '+d.name+'. ':''}${axisVisible?'Línea E: eje '+d.axis+', perpendicular al plano.':''}`}>
   <defs><marker id={`${uid}-arrow`} markerWidth="7" markerHeight="7" refX="6" refY="3" orient="auto"><path d="M0 0 L6 3 L0 6" fill="#bd6530"/></marker></defs>
-  <polygon points={points([[-130,0,-110],[130,0,-110],[130,0,110],[-130,0,110]])} fill="#f3f0f7" stroke="#e2dbe9"/>
-  <path d={`M${origin} L${anterior}`} stroke="#aaa0b8" strokeWidth="2"/><text x={anterior[0]+5} y={anterior[1]+16} className="plane-small">ANTERIOR</text>
+  <polygon points={points([[-130,0,-110],[130,0,-110],[130,0,110],[-130,0,110]])} fill="#f7f4f0" stroke="#e9e4db"/>
+  <path d={`M${origin} L${anterior}`} stroke="#b9af9f" strokeWidth="2"/><text x={anterior[0]+5} y={anterior[1]+16} className="plane-small">ANTERIOR</text>
   {planeVisible&&<><polygon points={points(planeCorners)} fill="#b8dbee" fillOpacity=".48" stroke="#357895" strokeWidth="2"/><line x1={project(planeCorners[0])[0]} y1={project(planeCorners[0])[1]} x2={project(planeCorners[2])[0]} y2={project(planeCorners[2])[1]} stroke="#357895" strokeDasharray="3 6" opacity=".4"/><text x={pp[0]+8} y={pp[1]-7} fill="#20546e">P · plano</text></>}
   <path d={path.map((p,i)=>`${i?'L':'M'}${project(p)}`).join(' ')} fill="none" stroke="#bd6530" strokeWidth="2.5" strokeDasharray="5 5" markerEnd={`url(#${uid}-arrow)`}/>
-  {staticLines.map((p,i)=><polyline key={i} points={points(p)} fill="none" stroke="#aaa0b8" strokeWidth="13" strokeLinejoin="round" strokeLinecap="round"/>)}
-  <polyline points={points(movingLimb(joint,motion,0))} fill="none" stroke="#b7a9ca" strokeWidth="11" strokeDasharray="5 5" strokeLinecap="round" opacity=".55"/>
-  <circle cx={h[0]} cy={h[1]} r="20" fill="#ede4f4" stroke="#84718f" strokeWidth="3"/>
-  <polyline points={points(limb)} fill="none" stroke="#7245ad" strokeWidth="14" strokeLinejoin="round" strokeLinecap="round"/>
-  {limb.map((p,i)=><circle key={i} cx={project(p)[0]} cy={project(p)[1]} r="5" fill="white" stroke="#7245ad" strokeWidth="2"/>)}
+  {staticLines.map((p,i)=><polyline key={i} points={points(p)} fill="none" stroke="#b9af9f" strokeWidth="13" strokeLinejoin="round" strokeLinecap="round"/>)}
+  <polyline points={points(movingLimb(joint,motion,0))} fill="none" stroke="#c5baae" strokeWidth="11" strokeDasharray="5 5" strokeLinecap="round" opacity=".55"/>
+  <circle cx={h[0]} cy={h[1]} r="20" fill="#f4eee4" stroke="#94846c" strokeWidth="3"/>
+  <polyline points={points(limb)} fill="none" stroke="#754f39" strokeWidth="14" strokeLinejoin="round" strokeLinecap="round"/>
+  {limb.map((p,i)=><circle key={i} cx={project(p)[0]} cy={project(p)[1]} r="5" fill="white" stroke="#754f39" strokeWidth="2"/>)}
   {axisVisible&&<><polyline points={points(axisEnds)} stroke="#99374f" strokeWidth="4" strokeDasharray="10 5"/><circle cx={cp[0]} cy={cp[1]} r="8" fill="white" stroke="#99374f" strokeWidth="2"/><circle cx={cp[0]} cy={cp[1]} r="2" fill="#99374f"/><text x={ap[0]+9} y={ap[1]-7} fill="#832c43">E · eje</text></>}
-  <circle cx={jp[0]} cy={jp[1]} r="13" fill="none" stroke="#58307e" strokeWidth="2"/><text x={jp[0]+18} y={jp[1]+22} fill="#58307e">{jointNames[joint]} D</text>
+  <circle cx={jp[0]} cy={jp[1]} r="13" fill="none" stroke="#553928" strokeWidth="2"/><text x={jp[0]+18} y={jp[1]+22} fill="#553928">{jointNames[joint]} D</text>
   <text x="18" y="26" className="plane-small">D = DERECHA DE LA FIGURA · ESQUEMA ESPACIAL</text>
   <text x="18" y="459" className="plane-small">TRAZO NARANJA = RECORRIDO · SEGMENTO MORADO = POSICIÓN ACTUAL</text>
  </svg>;
