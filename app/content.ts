@@ -3,8 +3,10 @@ import {planeQuestions} from './planes-content';
 // a = anterior; p = posterior. Las zonas son proyecciones orientativas, no inserciones.
 export type Layer = 'muscles'|'bones'|'joints';
 export type View = 'a'|'p';
-export type Structure = {id:string;name:string;layer:Layer;kind:string;location:string;fn:string;example:string;points:Partial<Record<View,[number,number]>>};
+export type Structure = {id:string;name:string;layer:Layer;kind:string;location:string;fn:string;example:string;sources?:{label:string;url?:string}[];points:Partial<Record<View,[number,number]>>};
 export const layers:Record<Layer,string>={muscles:'Músculos',bones:'Huesos',joints:'Articulaciones'};
+// REVISIÓN: rellena revisor y fecha cuando un especialista valide las fichas (p. ej. {reviewer:'Nombre, cargo',date:'2026-12'}).
+export const reviewStatus:{reviewer:string;date:string}={reviewer:'',date:''};
 export const structures:Structure[]=[
  {id:'pectoral',name:'Pectoral mayor',layer:'muscles',kind:'Músculo',location:'Parte anterior del tórax; llega al húmero.',fn:'Aduce y rota internamente el brazo; participa en la aducción horizontal.',example:'Al subir en una flexión de brazos colabora con tríceps y estabilizadores escapulares.',points:{a:[48,25]}},
  {id:'deltoid',name:'Deltoides',layer:'muscles',kind:'Músculo con tres porciones',location:'Cubre el hombro. Sus porciones son anterior, media y posterior.',fn:'La porción media abduce el brazo; las otras contribuyen a flexión o extensión según la tarea.',example:'En el press de hombros eleva el brazo junto con otros músculos del complejo del hombro.',points:{a:[69,22],p:[58,22]}},

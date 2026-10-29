@@ -7,4 +7,4 @@
 - Las ilustraciones de la nueva lección son SVG originales esquemáticos. Las imágenes proporcionadas para referencia no se redistribuyen como archivos adjuntos.
 - No se incorporó código ni modelos de ImliStack/Body-Atlas-3D: véase REVISION-BODY-ATLAS-3D.md.
 
-No se ha impuesto una nueva licencia general al código y contenido propios en nombre del titular. Antes de conceder reutilización general, el titular puede elegir una licencia para su aportación sin alterar las condiciones de terceros. Un repositorio público no equivale por sí solo a una licencia de reutilización.
+Licencias propias del proyecto: el código va bajo MIT (`LICENSE` en la raíz) y el contenido didáctico bajo CC BY-NC-SA 4.0 (`LICENSE-CONTENIDO.md`). Ninguna de las dos modifica las condiciones de los materiales de terceros citados arriba.

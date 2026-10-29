@@ -32,5 +32,8 @@ npm run preview:pages # http://localhost:4175/
 - [Aula en directo](docs/GUIA-AULA-EN-DIRECTO.md) (necesita Node.js; GitHub Pages no la ejecuta)
 - [Comprobaciones](docs/COMPROBACIONES.md) · [Atribuciones](docs/THIRD-PARTY-NOTICES.md)
 
+## Licencia
+Código: [MIT](LICENSE). Contenido didáctico: [CC BY-NC-SA 4.0](LICENSE-CONTENIDO.md) (puedes reutilizarlo y adaptarlo citando la autoría, sin uso comercial y compartiendo igual). Los materiales de terceros mantienen su licencia: [atribuciones](docs/THIRD-PARTY-NOTICES.md).
+
 ## Límites
 Contenido introductorio pendiente de contraste con la programación y de revisión anatómica especializada. No es un simulador clínico ni un sistema oficial de evaluación; las respuestas abiertas las valora el profesor y los dibujos son esquemáticos.
