@@ -4,6 +4,7 @@ import {useBundle} from '../lazy-bundle';
 import type {MannequinProps} from './scene';
 import type {LeverProps} from './levers';
 import type {CoreProps} from './core';
+import type {ExerciseProps} from './exercise';
 
 // Los maniquíes (con Three.js) van en mannequin.js y solo se descargan cuando aparecen en pantalla.
 // Mientras carga, o si falla, se muestra el esquema 2D que se le pase como fallback.
@@ -20,6 +21,10 @@ export default function Mannequin3D({fallback,...props}:MannequinProps&{fallback
 export function Lever3D({fallback,...props}:LeverProps&{fallback?:ReactNode}){
  const {Comp,failed}=useBundle<LeverProps>('./mannequin.js','__mannequin','levers');
  return Comp?<Comp {...props}/>:<Loading fallback={fallback} compact={props.compact} failed={failed}/>;
+}
+export function Exercise3D({fallback,...props}:ExerciseProps&{fallback?:ReactNode}){
+ const {Comp,failed}=useBundle<ExerciseProps>('./mannequin.js','__mannequin','exercise');
+ return Comp?<Comp {...props}/>:<Loading fallback={fallback} failed={failed}/>;
 }
 export function Core3D({fallback,...props}:CoreProps&{fallback?:ReactNode}){
  const {Comp,failed}=useBundle<CoreProps>('./mannequin.js','__mannequin','core');

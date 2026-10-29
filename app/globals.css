@@ -156,3 +156,10 @@ input[type="checkbox"],input[type="radio"],input[type="range"]{accent-color:var(
 .lever-legend span{align-items:flex-start}
 .mannequin-legend i.fulcrum{background:var(--ink);border-radius:50%}
 .core3d .mannequin-stage{aspect-ratio:1/1;max-height:560px}
+
+/* ===== Ejercicios en el maniquí 3D ===== */
+.exercise3d .mannequin-stage{aspect-ratio:4/3.4}
+.joint-tag{position:absolute;left:0;top:0;z-index:3;pointer-events:none;font-size:.8rem;font-weight:600;color:var(--ink);background:#fffdf8ee;border:1.5px solid var(--ink);border-radius:4px;padding:2px 7px;white-space:nowrap}
+.joint-tag.active{font-size:.95rem;background:#fff;box-shadow:0 0 0 3px #9a621255}
+.joint-tag.scapular{border-style:dashed}
+.lab-fichas{display:flex;flex-wrap:wrap;align-items:center;gap:4px 10px;margin:6px 0 10px;font-size:.9rem;color:var(--ink-soft)}

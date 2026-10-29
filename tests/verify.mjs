@@ -75,3 +75,26 @@ assert.ok(c.questions.find(x=>x.id==='plane-knee-flex').why.includes('casi no pu
 const previous={...m.fresh(),results:{'0:r1':{...m.emptyResult(),done:true,points:2}}};
 assert.equal(m.restore(JSON.stringify(previous)).results['0:r1'].points,2,'La ampliación conserva resultados previos');
 console.log('PASS: tres planos y ejes ortogonales; dieciocho gestos en cinco articulaciones, longitudes constantes, rotaciones coherentes y conservación del progreso anterior.');
+
+// Ejercicios en el maniquí: poses validadas, pies en el suelo y ángulos coherentes
+const ep=moduleFrom('app/exercise-poses.ts');
+const near=(a,b,tol=1e-6)=>Math.abs(a-b)<=tol;
+assert.equal(JSON.stringify(ep.anglesAt('squat',0)),JSON.stringify(ep.exercisePoses.squat.low),'Fase baja = pose validada');
+assert.equal(JSON.stringify(ep.anglesAt('press',1)),JSON.stringify(ep.exercisePoses.press.high),'Fase alta = pose validada');
+assert.ok(near(ep.exercisePoses.press.low.shoulder,85)&&near(ep.exercisePoses.press.high.shoulder,170)&&near(ep.exercisePoses.press.low.elbow,95)&&near(ep.exercisePoses.press.high.elbow,10));
+for(const id of ['squat','lunge'])for(let i=0;i<=20;i++){
+ const a=ep.anglesAt(id,i/20),{s,t,tau}=ep.flatLeg(a);
+ // Pie plano: tobillo = inclinación de la tibia; rodilla = muslo + tibia; cadera = muslo + tronco
+ assert.ok(near(a.ankle,s)&&near(a.knee,t+s)&&near(a.hip,t+tau),'Ángulos coherentes con el pie plano');
+ const anchor=id==='lunge'?ep.LUNGE_FRONT_ANKLE:[ep.SEG.ankleY,0],hip=ep.hipFromAnkle(anchor,s,t);
+ assert.ok(near(Math.hypot(hip[0]-anchor[0],hip[1]-anchor[1])<=ep.SEG.thigh+ep.SEG.shank+1e-9?1:0,1),'La cadera queda al alcance de la pierna');
+ if(id==='lunge'){
+  const r=ep.rearLeg(hip,ep.LUNGE_REAR_BALL,90-75*i/20),o=ep.ballOffset(r.foot);
+  assert.ok(near(r.ankle[0]+o[0],ep.LUNGE_REAR_BALL[0])&&near(r.ankle[1]+o[1],ep.LUNGE_REAR_BALL[1]),'La punta del pie trasero no se despega del suelo');
+  assert.ok(Math.hypot(r.ankle[0]-hip[0],r.ankle[1]-hip[1])-(ep.SEG.thigh+ep.SEG.shank)<2.5,'La pierna trasera llega (holgura menor de 2,5 cm)');
+  assert.ok(r.knee[0]>ep.SEG.ankleY,'La rodilla trasera no atraviesa el suelo');
+ }
+}
+const deep=ep.rearLeg(ep.hipFromAnkle(ep.LUNGE_FRONT_ANKLE,ep.flatLeg(ep.anglesAt('lunge',0)).s,ep.flatLeg(ep.anglesAt('lunge',0)).t),ep.LUNGE_REAR_BALL,90);
+assert.ok(near(deep.kneeFlex,90,1),'Zancada baja: rodilla trasera a unos 90°');
+console.log('PASS: ejercicios en el maniquí (sentadilla, zancada y press): poses validadas, pie plano, apoyo trasero en el suelo y alcance de la pierna.');

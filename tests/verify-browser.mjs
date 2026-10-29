@@ -99,6 +99,23 @@ for(const vp of viewports){
   else console.log(`  ✓ ${where} · ${shown}`);
  }
 
+ // Ejercicios en el maniquí 3D: poses al subir y enlace a la ficha
+ for(const [name,top,ficha] of [['Sentadilla','Rodilla · 0° flexión','Cuádriceps femoral'],['Zancada','Cadera · 20° flexión',null],['Press de hombros','Hombro · 170° elevación',null]]){
+  where=`${vp.name} · ejercicio ${name} en 3D`;
+  await page.locator('.mode-nav .mode-chip',{hasText:'Explorar'}).click();
+  await page.locator('.exercise-card',{hasText:name}).click();
+  await page.getByRole('button',{name:'Maniquí 3D'}).click();
+  try{await page.locator('.exercise3d canvas').first().waitFor({timeout:20000});}catch{fail(where,'no aparece el maniquí del ejercicio');}
+  await page.locator('.lab-slider input').fill('50');await page.waitForTimeout(500);
+  const tags=await page.locator('.joint-tag').allInnerTexts();
+  if(!tags.some(t=>t.includes(top)))fail(where,`arriba debería verse «${top}» y se ve: ${tags.join(' | ')}`);else console.log(`  ✓ ${where}`);
+  if(ficha){
+   await page.getByRole('button',{name:new RegExp('Ver ficha · '+ficha)}).click();
+   const card=await page.locator('.detail-panel').innerText();
+   if(!card.includes(ficha))fail(where,'«Ver ficha» no abre la ficha en Explorar');else console.log(`  ✓ ${vp.name} · Ver ficha abre ${ficha}`);
+  }else{await page.keyboard.press('Escape');await page.waitForTimeout(300);}
+ }
+
  // Guardar y recuperar progreso
  where=`${vp.name} · guardar y recuperar progreso`;
  await page.evaluate(()=>localStorage.setItem('cuerpo-prueba-navegador','ok'));
@@ -121,4 +138,4 @@ for(const vp of viewports){
 await browser.close();
 server.close();
 if(failures.length){console.error(`\nFALLO: ${failures.length} problema(s) en el navegador.`);process.exit(1);}
-console.log('PASS navegador: 11 modos y laboratorio de codo, rodilla y tobillo en escritorio y móvil sin errores (maniquí en Lecciones y Core; el 3D anatómico solo se carga al entrar), y guardado/recuperación de progreso.');
+console.log('PASS navegador: 11 modos, laboratorio de codo, rodilla y tobillo, y ejercicios en 3D en escritorio y móvil sin errores (maniquí en Lecciones y Core; el 3D anatómico solo se carga al entrar), y guardado/recuperación de progreso.');
