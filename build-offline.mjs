@@ -5,6 +5,7 @@ import {fileURLToPath} from 'node:url';
 import {copyFileSync,readFileSync,writeFileSync,mkdirSync,cpSync} from 'node:fs';
 const root=fileURLToPath(new URL('.',import.meta.url));
 await build({configFile:false,root,publicDir:false,define:{'process.env.NODE_ENV':'"production"'},plugins:[react()],resolve:{alias:{'@':root}},css:{postcss:{plugins:[tailwindcss()]}},build:{outDir:'dist-offline',emptyOutDir:true,lib:{entry:root+'offline-entry.tsx',name:'AtlasTseas',formats:['iife'],fileName:()=> 'atlas.js',cssFileName:'atlas'},cssCodeSplit:false}});
+await build({configFile:false,root,publicDir:false,define:{'process.env.NODE_ENV':'"production"'},plugins:[react()],resolve:{alias:{'@':root}},build:{outDir:'dist-offline',emptyOutDir:false,lib:{entry:root+'three-entry.tsx',name:'Atlas3DChunk',formats:['iife'],fileName:()=> 'atlas3d.js'},rollupOptions:{external:['react','react/jsx-runtime'],output:{globals:{'react':'__ATLAS_REACT.React','react/jsx-runtime':'__ATLAS_REACT.jsxRuntime'}}}}});
 copyFileSync(root+'public/favicon.svg',root+'dist-offline/favicon.svg');
 for(const f of ['icon-192.png','icon-512.png','manifest.webmanifest'])copyFileSync(root+'public/'+f,root+'dist-offline/'+f);
 writeFileSync(root+'dist-offline/sw.js',readFileSync(root+'public/sw.template.js','utf8').replace('__BUILD__',Date.now().toString(36)));

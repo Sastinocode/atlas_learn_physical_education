@@ -11,7 +11,8 @@ import {AlertDialog,AlertDialogContent,AlertDialogTitle,AlertDialogDescription} 
 import {NativeSelect} from '@/components/ui/native-select';
 import {RadioGroup,RadioGroupItem} from '@/components/ui/radio-group';
 import {structures,exercises,questions,layers,type Layer,type View} from './content';
-import Atlas3D,{THREE_STORAGE} from './atlas3d';
+import Atlas3D from './three-lazy';
+import {THREE_STORAGE} from './three-storage';
 import BodyImage from './body-image';
 import ExerciseLab from './exercise-lab';
 import {ExerciseThumbnail} from './exercise-art';

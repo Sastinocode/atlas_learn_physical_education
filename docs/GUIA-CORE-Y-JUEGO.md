@@ -2,7 +2,7 @@
 
 ## Abrir en clase
 
-Extrae todo el ZIP y abre index.html en Chrome, Edge o Firefox. Mantén atlas.js, atlas.css y la carpeta credits junto al HTML. No necesita cuentas ni conexión para funcionar. Cada ordenador conserva su propio progreso en el navegador; localhost es solo la vista previa del ordenador del profesor.
+Extrae todo el ZIP y abre index.html en Chrome, Edge o Firefox. Mantén atlas.js, atlas3d.js, atlas.css y la carpeta credits junto al HTML. No necesita cuentas ni conexión para funcionar. Cada ordenador conserva su propio progreso en el navegador; localhost es solo la vista previa del ordenador del profesor.
 
 ## Explicar el core
 

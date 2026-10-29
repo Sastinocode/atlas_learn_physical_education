@@ -6,7 +6,7 @@ Aplicación didáctica para TSEAS en español de España. Incluye 15 músculos o
 
 1. Abre la carpeta `dist-offline`.
 2. Haz doble clic en `index.html`. Usa un navegador actual (Edge, Chrome o Firefox).
-3. Conserva juntos `index.html`, `atlas.js` y `atlas.css`. Puedes copiar toda la carpeta o compartir el ZIP con el alumnado.
+3. Conserva juntos `index.html`, `atlas.js`, `atlas3d.js` y `atlas.css`. Puedes copiar toda la carpeta o compartir el ZIP con el alumnado.
 
 No requiere conexión, cuentas, suscripciones ni servicios externos. Los enlaces de fuentes sí necesitan conexión. Si el navegador restringe el almacenamiento al abrir archivos locales, la aplicación avisa y sigue funcionando durante la sesión. Para disponer de un origen local estable: desde `dist-offline`, ejecuta `python -m http.server 4174 --bind 127.0.0.1` y abre `http://localhost:4174`.
 
@@ -97,7 +97,7 @@ La selección contiene 13 músculos/grupos, 11 huesos y el tendón calcáneo, co
 
 Las geometrías conservan la simplificación y coordenadas del repositorio. El modelo adulto masculino no cubre todas las variaciones humanas. Las traslaciones de inspección no simulan contracción, inserciones, rangos articulares ni biomecánica. Las piezas óseas contextuales sin ficha mantienen su nombre de origen en inglés, identificado como tal.
 
-No hay peticiones a servidores externos para cargar modelos. La geometría comprimida está integrada en `atlas.js`; el paquete es mayor (aproximadamente 13 MB de JavaScript sin comprimir). El visor requiere WebGL y DecompressionStream de un navegador actual. Si el dispositivo no los admite, el atlas 2D y las actividades siguen disponibles. No se ha comprobado en tableta física.
+No hay peticiones a servidores externos para cargar modelos. La geometría comprimida está en `atlas3d.js`, que solo se descarga al entrar en Atlas 3D; el paquete es mayor (aproximadamente 13 MB de JavaScript sin comprimir). El visor requiere WebGL y DecompressionStream de un navegador actual. Si el dispositivo no los admite, el atlas 2D y las actividades siguen disponibles. No se ha comprobado en tableta física.
 
 Edición: `app/atlas3d.tsx` contiene controles y enlaces didácticos; `app/three` contiene el motor adaptado; `scripts/prepare-atlas.py` declara los identificadores FMA y genera `app/three/model.json` desde `../human-atlas-reference`. No necesitas ese repositorio para abrir o compilar el modelo ya incluido; solo para regenerarlo. Tras cambiar correspondencias ejecuta `python scripts/prepare-atlas.py` y `node verify-3d.mjs`, además de las verificaciones habituales. El estado de inspección usa la clave local `cuerpo-movimiento-3d-v1`, separada de las puntuaciones.
 

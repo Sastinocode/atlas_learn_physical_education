@@ -6,7 +6,8 @@ import type {Atlas,SceneState,SystemId,View} from './three/anatomy';
 import {opacityFor} from './three/display-options';
 import {structures,questions} from './content';
 
-export const THREE_STORAGE='cuerpo-movimiento-3d-v1';
+import {THREE_STORAGE} from './three-storage';
+export {THREE_STORAGE};
 const atlas=model as unknown as Atlas;
 const initial=():SceneState=>({visible:['skeletal','muscular','connective'],selected:[],isolate:false,explode:0,view:'front',rotate:false,reset:0,offset:[0,0,0],opacity:{skeletal:1,muscular:1,connective:1},lightweight:false});
 const layerNames={skeletal:'Huesos',muscular:'Músculos',connective:'Tendón calcáneo'};

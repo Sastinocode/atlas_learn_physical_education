@@ -44,6 +44,8 @@ for(const vp of viewports){
  const context=await browser.newContext({...vp.options,acceptDownloads:true,serviceWorkers:'block'});
  const page=await context.newPage();
  let where=`${vp.name} · inicio`;
+ let loaded3d=false;
+ page.on('request',r=>{if(r.url().endsWith('/atlas3d.js'))loaded3d=true;});
  page.on('pageerror',e=>fail(where,`error de la página: ${e.message}`));
  page.on('console',m=>{if(m.type()==='error'&&!(ignoreInfo&&/404/.test(m.text())))fail(where,`error en consola: ${m.text()}`);});
  page.on('requestfailed',r=>!r.url().endsWith('/api/info')&&fail(where,`no se pudo cargar ${r.url()}`));
@@ -52,6 +54,7 @@ for(const vp of viewports){
  await page.goto(url);
  await page.waitForSelector('.mode-nav .mode-chip');
  await page.getByRole('button',{name:/Abrir el atlas/}).click();
+ if(loaded3d)fail(where,'el 3D se descarga al abrir la app, debería cargarse solo al entrar en Atlas 3D');
  const chips=page.locator('.mode-nav .mode-chip');
  const total=await chips.count();
  if(total!==11)fail(vp.name,`se esperaban 11 modos y hay ${total}`);
@@ -63,6 +66,10 @@ for(const vp of viewports){
   await chip.click();
   await page.waitForTimeout(700);
   if(await chip.getAttribute('data-active')===null)fail(where,'el modo no queda activo al pulsarlo');
+  if(name==='Atlas 3D'){
+   if(!loaded3d)fail(where,'no se ha pedido atlas3d.js');
+   try{await page.locator('main canvas').first().waitFor({timeout:30000});}catch{fail(where,'no aparece el visor 3D (canvas)');}
+  }
   const text=(await page.locator('main').innerText()).trim();
   if(text.length<80)fail(where,'la pantalla casi no tiene contenido');
   const overflow=await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1);
@@ -92,4 +99,4 @@ for(const vp of viewports){
 await browser.close();
 server.close();
 if(failures.length){console.error(`\nFALLO: ${failures.length} problema(s) en el navegador.`);process.exit(1);}
-console.log('PASS navegador: 11 modos en escritorio y móvil sin errores, y guardado/recuperación de progreso.');
+console.log('PASS navegador: 11 modos en escritorio y móvil sin errores (el 3D solo se carga al entrar), y guardado/recuperación de progreso.');
