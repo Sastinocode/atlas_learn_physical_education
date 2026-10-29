@@ -1,0 +1,6 @@
+// Ejemplos corporales de los tres géneros de palanca (lección, juego y maniquí 3D)
+export const levers=[
+ {title:'Primer género',middle:'El apoyo queda en medio',order:'FAR',name:'Equilibrio de la cabeza',parts:['F · Extensores cervicales, detrás','A · Articulación atlantooccipital','R · Peso de la cabeza, delante'],why:'La tracción posterior y el peso anterior generan momentos opuestos alrededor del apoyo. La ventaja mecánica depende de las distancias: el primer género no siempre multiplica la fuerza.'},
+ {title:'Segundo género',middle:'La resistencia queda en medio',order:'ARF',name:'Elevación de talones',parts:['A · Contacto del antepié con el suelo','R · Carga transmitida a través del tobillo','F · Tracción de Aquiles sobre el calcáneo'],why:'En este modelo del pie apoyado, la resistencia está entre el antepié y el tendón calcáneo. Sóleo y gastrocnemio aportan fuerza. El apoyo de esta palanca es externo: no es el tobillo.'},
+ {title:'Tercer género',middle:'La fuerza se aplica en medio',order:'AFR',name:'Flexión de codo con carga',parts:['A · Eje del codo','F · Tracción del bíceps en el radio','R · Carga en la mano'],why:'El bíceps aplica su fuerza entre el codo y la carga. Su brazo de momento corto exige una fuerza elevada; esta disposición favorece recorrido y velocidad distal. También participan otros flexores.'}
+];

@@ -2,9 +2,9 @@
 import {useEffect,useState,type ComponentType} from 'react';
 
 // Carga un archivo .js aparte (con una etiqueta <script> normal, que también funciona con doble clic)
-// y devuelve el componente que ese archivo deja en window[key].
-export function useBundle<P>(src:string,key:string){
- const read=()=>(window as unknown as Record<string,{default:ComponentType<P>}|undefined>)[key]?.default??null;
+// y devuelve el componente que ese archivo deja en window[key][exportName].
+export function useBundle<P>(src:string,key:string,exportName='default'){
+ const read=()=>(window as unknown as Record<string,Record<string,ComponentType<P>>|undefined>)[key]?.[exportName]??null;
  const [Comp,setComp]=useState<ComponentType<P>|null>(read);
  const [failed,setFailed]=useState(false);
  const [attempt,setAttempt]=useState(0);

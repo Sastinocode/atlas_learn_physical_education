@@ -149,3 +149,10 @@ input[type="checkbox"],input[type="radio"],input[type="range"]{accent-color:var(
  .three-tools button{flex:0 0 auto;font-size:.85rem;padding:8px 12px}
  .atlas3d .three-library{order:2}.atlas3d .three-center{order:1}.atlas3d .three-detail{order:3}
 }
+.lever-tag{position:absolute;left:0;top:0;z-index:3;pointer-events:none;display:inline-grid;place-items:center;width:26px;height:26px;border-radius:50%;font-family:var(--font-serif);font-weight:700;font-size:.95rem;color:#fff;background:var(--ink)}
+.lever-tag[hidden]{display:none!important}
+.lever-tag.F{background:#a8423a}.lever-tag.R{background:#6b5f50}
+.lever-legend .lever-tag{position:static;width:22px;height:22px;font-size:.8rem;margin-right:6px;flex:0 0 auto}
+.lever-legend span{align-items:flex-start}
+.mannequin-legend i.fulcrum{background:var(--ink);border-radius:50%}
+.core3d .mannequin-stage{aspect-ratio:1/1;max-height:560px}

@@ -1,2 +1,4 @@
 import Mannequin from './app/mannequin/scene';
-(window as unknown as {__mannequin:{default:typeof Mannequin}}).__mannequin={default:Mannequin};
+import LeverMannequin from './app/mannequin/levers';
+import CoreMannequin from './app/mannequin/core';
+(window as unknown as {__mannequin:Record<string,unknown>}).__mannequin={default:Mannequin,levers:LeverMannequin,core:CoreMannequin};

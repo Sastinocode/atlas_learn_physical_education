@@ -1,12 +1,12 @@
 import {useEffect,useRef,useState} from 'react';
 import {BodyPlane,LeverPicture} from './mechanics-lesson';
-import Mannequin3D from './mannequin/lazy';
+import Mannequin3D,{Lever3D} from './mannequin/lazy';
 import {planeDemos} from './planes-content';
 import {challengeSets,CHALLENGE_STORAGE,points,validRun,type ChallengeRun,type Challenge} from './challenge-content';
 const initial=():ChallengeRun=>({answers:[],deadline:0,seconds:60,profile:'Equipo Órbita',started:false});
 function Diagram({kind}:{kind:Challenge['diagram']}){
  if(!kind)return null;
- if(['FAR','ARF','AFR'].includes(kind))return <figure className="challenge-diagram"><LeverPicture index={['FAR','ARF','AFR'].indexOf(kind)} labels/><figcaption>Ejemplo corporal del género de palanca. A: apoyo · F: fuerza muscular · R: resistencia. Esquema sin escala.</figcaption></figure>;
+ if(['FAR','ARF','AFR'].includes(kind))return <figure className="challenge-diagram"><Lever3D compact labels index={['FAR','ARF','AFR'].indexOf(kind)} fallback={<LeverPicture index={['FAR','ARF','AFR'].indexOf(kind)} labels/>}/><figcaption>Ejemplo corporal del género de palanca. A: apoyo · F: fuerza muscular · R: resistencia. Esquema sin escala.</figcaption></figure>;
  if(kind!=='multi')return <figure className="challenge-diagram"><Mannequin3D compact autoplay camera="oblique" {...planeDemos[kind as keyof typeof planeDemos]} fallback={<BodyPlane index={['sagital','frontal','transversal'].indexOf(kind)}/>}/><figcaption>Superficie: plano. Línea: eje perpendicular. Posición anatómica de referencia.</figcaption></figure>;
  return <figure className="challenge-diagram"><svg viewBox="0 0 480 190" role="img" aria-label="Circunducción: recorrido cónico"><ellipse cx="255" cy="110" rx="95" ry="45" fill="#f9f5ee" stroke="#7c5239" strokeWidth="3" strokeDasharray="7 5"/><path d="M145 40L160 110M145 40L350 110" stroke="#7c5239" strokeWidth="3"/><circle cx="145" cy="40" r="7" fill="#7c5239"/><text x="240" y="182" textAnchor="middle" fontSize="18">Recorrido cónico · combinación de planos</text></svg><figcaption>Un extremo permanece relativamente fijo y el otro describe un círculo.</figcaption></figure>;
 }
