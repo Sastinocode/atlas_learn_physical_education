@@ -1,7 +1,7 @@
 'use client';
 import {useState} from 'react';
-import anatomy from './assets/anatomy.png?inline';
-import skeleton from './assets/skeleton.png?inline';
+import anatomy from './assets/anatomy.webp?inline';
+import skeleton from './assets/skeleton.webp?inline';
 import type {View} from './content';
 export default function BodyImage({view,muscles=false,onReady}:{view:View;muscles?:boolean;onReady?:(ready:boolean)=>void}){
  const [failed,setFailed]=useState(false);

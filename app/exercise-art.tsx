@@ -1,10 +1,10 @@
 import {useState} from 'react';
-import squat from './assets/exercise-squat-v1.png?inline';
-import lunge from './assets/exercise-lunge-v1.png?inline';
-import calf from './assets/exercise-calf-v1.png?inline';
-import pushup from './assets/exercise-pushup-v1.png?inline';
-import row from './assets/exercise-row-v1.png?inline';
-import press from './assets/exercise-press-v1.png?inline';
+import squat from './assets/exercise-squat-v1.webp?inline';
+import lunge from './assets/exercise-lunge-v1.webp?inline';
+import calf from './assets/exercise-calf-v1.webp?inline';
+import pushup from './assets/exercise-pushup-v1.webp?inline';
+import row from './assets/exercise-row-v1.webp?inline';
+import press from './assets/exercise-press-v1.webp?inline';
 const illustrations:Record<string,string>={squat,lunge,calf,pushup,row,press};
 export function ExerciseThumbnail({id}:{id:string}){
  return <span className="exercise-thumbnail" aria-hidden="true" style={{backgroundImage:`url(${illustrations[id]})`}}/>;
