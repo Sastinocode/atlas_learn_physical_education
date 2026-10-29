@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import {challengeSets,points,validRun} from './app/challenge-content.ts';
+import {challengeSets,points,validRun} from '../app/challenge-content.ts';
 for(const set of Object.values(challengeSets)){
  assert.equal(set.questions.length,10);
  for(const q of set.questions){assert.ok(q.correct>=0&&q.correct<q.options.length);assert.equal(new Set(q.options).size,q.options.length);assert.ok(q.why.length>40);}

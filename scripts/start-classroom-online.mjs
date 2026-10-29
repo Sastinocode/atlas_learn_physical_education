@@ -8,7 +8,7 @@ if(!Number.isInteger(port)||port<1024||port>65535)throw new Error('Puerto no vá
 const dashboard=`http://localhost:${port}/live/`;
 function openBrowser(){if(process.platform==='win32'&&process.env.AULA_NO_OPEN!=='1')spawn('powershell.exe',['-NoProfile','-Command',`Start-Process '${dashboard}'`],{windowsHide:true,stdio:'ignore'}).on('error',()=>console.log(`Abre ${dashboard}`));}
 try{const info=await fetch(`http://127.0.0.1:${port}/api/info`,{signal:AbortSignal.timeout(1500)}).then(r=>r.json());if(info.service==='movimiento-aula'){console.log('La aplicación ya está abierta. Recuperando el panel…');openBrowser();process.exit(0);}}catch{}
-if(!existsSync(exe)){console.error('No se encuentra el conector de internet. Conserva completa la carpeta de la aplicación. Consulta GUIA-AULA-EN-DIRECTO.md.');process.exit(1);}
+if(!existsSync(exe)){console.error('No se encuentra el conector de internet. Conserva completa la carpeta de la aplicación. Consulta docs/GUIA-AULA-EN-DIRECTO.md.');process.exit(1);}
 let address='',tunnel,stopping=false;
 const server=createClassroomServer({publicUrl:()=>address,online:true});
 server.on('error',e=>{console.error(`No se pudo abrir el servidor: ${e.message}`);process.exitCode=1;});

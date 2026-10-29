@@ -2,7 +2,7 @@
 cd /d "%~dp0"
 where node >nul 2>nul
 if errorlevel 1 (
- echo No se encuentra Node.js. Consulta GUIA-AULA-EN-DIRECTO.md.
+ echo No se encuentra Node.js. Consulta docs/GUIA-AULA-EN-DIRECTO.md.
  pause
  exit /b 1
 )

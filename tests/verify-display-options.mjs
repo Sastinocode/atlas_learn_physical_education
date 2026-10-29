@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import {opacityFor,renderRatio,createDemandLoop} from './app/three/display-options.ts';
+import {opacityFor,renderRatio,createDemandLoop} from '../app/three/display-options.ts';
 assert.equal(opacityFor(undefined,'muscular'),1);
 assert.equal(opacityFor({muscular:NaN},'muscular'),1);
 assert.equal(opacityFor({muscular:-2},'muscular'),0);
