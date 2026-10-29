@@ -92,3 +92,6 @@
 
 /* Botones táctiles: mínimo 44 px en pantallas táctiles */
 @media(pointer:coarse){button,[role="tab"],select,summary{min-height:44px}}
+
+/* Guardar y recuperar progreso */
+.file-button{display:inline-flex;align-items:center;justify-content:center;cursor:pointer;min-height:44px}.file-msg{margin:8px 0 0;font-size:.9rem;color:#5d506d}.file-msg:empty{display:none}
