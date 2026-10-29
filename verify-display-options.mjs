@@ -1,0 +1,16 @@
+import assert from 'node:assert/strict';
+import {opacityFor,renderRatio,createDemandLoop} from './app/three/display-options.ts';
+assert.equal(opacityFor(undefined,'muscular'),1);
+assert.equal(opacityFor({muscular:NaN},'muscular'),1);
+assert.equal(opacityFor({muscular:-2},'muscular'),0);
+assert.equal(opacityFor({muscular:4},'muscular'),1);
+assert.equal(renderRatio(true,3,false),1);
+assert.equal(renderRatio(false,3,false),2);
+assert.equal(renderRatio(false,3,true),1.5);
+let next=0,hidden=false,moving=false,steps=0;const queued=new Map();
+const loop=createDemandLoop(()=>{steps++;return moving;},cb=>{queued.set(++next,cb);return next;},id=>queued.delete(id),()=>hidden);
+const tick=()=>{const [id,cb]=queued.entries().next().value;queued.delete(id);cb();};
+loop.invalidate();loop.invalidate();assert.equal(queued.size,1);tick();assert.equal(steps,1);assert.equal(queued.size,0);
+moving=true;loop.invalidate();tick();assert.equal(queued.size,1);moving=false;tick();assert.equal(queued.size,0);
+hidden=true;loop.invalidate();assert.equal(queued.size,0);hidden=false;loop.invalidate();assert.equal(queued.size,1);loop.dispose();assert.equal(queued.size,0);loop.invalidate();assert.equal(queued.size,0);
+console.log('PASS: opacidad, límites de resolución y ciclo bajo demanda: reposo, animación, pestaña oculta y desmontaje.');
