@@ -83,6 +83,22 @@ for(const vp of viewports){
   console.log(`  ✓ ${where}`);
  }
 
+ // Laboratorio de movimiento: codo, rodilla y tobillo con sus grados finales
+ where=`${vp.name} · laboratorio de movimiento`;
+ await page.locator('.mode-nav .mode-chip',{hasText:'Taller'}).click();
+ await page.getByRole('tab',{name:/Planos y ejes/}).or(page.getByRole('button',{name:/^Planos y ejes$/})).first().click();
+ await page.locator('.planes-visual .mannequin canvas').first().waitFor({timeout:20000}).catch(()=>fail(where,'no aparece el maniquí del laboratorio'));
+ for(const [joint,motion,degrees] of [['Codo','FLEX','145°'],['Codo','EXT','0°'],['Rodilla','FLEX','135°'],['Rodilla','EXT','0°'],['Tobillo','FD','20°'],['Tobillo','FP','50°']]){
+  where=`${vp.name} · laboratorio ${joint} ${motion}`;
+  await page.locator('.lab-joints button',{hasText:joint}).click();
+  await page.locator('.planes-motions button',{hasText:motion}).first().click();
+  await page.locator('.lab-slider input').fill('100');
+  await page.waitForTimeout(400);
+  const shown=(await page.locator('.planes-visual .mannequin-angle').innerText()).trim();
+  if(shown!==degrees)fail(where,`el arco marca ${shown} y debería marcar ${degrees}`);
+  else console.log(`  ✓ ${where} · ${shown}`);
+ }
+
  // Guardar y recuperar progreso
  where=`${vp.name} · guardar y recuperar progreso`;
  await page.evaluate(()=>localStorage.setItem('cuerpo-prueba-navegador','ok'));
@@ -105,4 +121,4 @@ for(const vp of viewports){
 await browser.close();
 server.close();
 if(failures.length){console.error(`\nFALLO: ${failures.length} problema(s) en el navegador.`);process.exit(1);}
-console.log('PASS navegador: 11 modos en escritorio y móvil sin errores (maniquí en Lecciones y Core; el 3D anatómico solo se carga al entrar), y guardado/recuperación de progreso.');
+console.log('PASS navegador: 11 modos y laboratorio de codo, rodilla y tobillo en escritorio y móvil sin errores (maniquí en Lecciones y Core; el 3D anatómico solo se carga al entrar), y guardado/recuperación de progreso.');

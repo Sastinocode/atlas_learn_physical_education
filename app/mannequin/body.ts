@@ -60,7 +60,7 @@ export function buildGround(scene:T.Scene){
  const ring=new T.Mesh(new T.RingGeometry(94,95.5,64),new T.MeshBasicMaterial({color:'#cdbd9f'}));ring.rotation.x=-Math.PI/2;ring.position.y=.3;scene.add(ring);
  // Flecha en el suelo: anterior
  const arrow=new T.Shape();arrow.moveTo(0,14);arrow.lineTo(-6,0);arrow.lineTo(-2,0);arrow.lineTo(-2,-8);arrow.lineTo(2,-8);arrow.lineTo(2,0);arrow.lineTo(6,0);arrow.closePath();
- const a=new T.Mesh(new T.ShapeGeometry(arrow),new T.MeshBasicMaterial({color:COLOR.ink,transparent:true,opacity:.55}));a.rotation.x=-Math.PI/2;a.position.set(0,.5,62);scene.add(a);
+ const a=new T.Mesh(new T.ShapeGeometry(arrow),new T.MeshBasicMaterial({color:COLOR.ink,transparent:true,opacity:.55,side:T.DoubleSide}));a.rotation.x=Math.PI/2;a.position.set(0,.5,62);scene.add(a); // la punta mira hacia +z (anterior)
 }
 
 // Escenario completo: renderizador, luces, suelo, cámara orbital y bucle que se pausa fuera de pantalla.

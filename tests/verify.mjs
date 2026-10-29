@@ -6,15 +6,15 @@ function moduleFrom(file,imports={}){const exports={};const js=ts.transpileModul
 const pc=moduleFrom('app/planes-content.ts');
 const c=moduleFrom('app/content.ts',{'./planes-content':pc});
 const m=moduleFrom('app/session.ts',{'./content':c});
-assert.equal(c.structures.length,32);assert.equal(c.questions.length,42);assert.equal(c.exercises.length,6);
-assert.equal(new Set(c.structures.map(x=>x.id)).size,32);assert.equal(new Set(c.questions.map(x=>x.id)).size,42);
+assert.equal(c.structures.length,32);assert.equal(c.questions.length,48);assert.equal(c.exercises.length,6);
+assert.equal(new Set(c.structures.map(x=>x.id)).size,32);assert.equal(new Set(c.questions.map(x=>x.id)).size,48);
 for(const [layer,min] of [['muscles',12],['bones',10],['joints',6]])assert.ok(c.structures.filter(x=>x.layer===layer).length>=min);
 for(const x of c.structures){assert.ok(x.location&&x.fn&&x.example&&x.kind);assert.ok(Object.keys(x.points).length);for(const p of Object.values(x.points))assert.ok(p.every(n=>Number.isFinite(n)&&n>0&&n<100));}
 for(const q of c.questions){assert.ok(q.why&&q.topic);if(q.mode==='localizar')assert.ok(c.structures.some(x=>x.id===q.target));else if(q.exercise)assert.ok(c.exercises.some(x=>x.id===q.exercise));if(q.mode==='relacionar')assert.ok(q.options.length>=3&&q.correct>=0&&q.correct<q.options.length);if(q.mode==='explicar')assert.equal(q.criteria.length,2);}
 for(const x of c.exercises)for(const field of ['variant','phase','movement','muscles','bones','joints','control'])assert.ok(x[field]);
 const r=m.emptyResult();assert.equal(m.answerResult(r,false,1).points,0);const hit=m.answerResult(r,true,1);assert.equal(hit.points,1);assert.equal(m.answerResult(hit,true,1).points,1);assert.equal(m.answerResult({...r,revealed:true},true,2).points,0);assert.equal(m.answerResult(m.answerResult(r,false,2),true,2).everWrong,true);
-const s=m.fresh();for(const q of c.questions)s.results[m.keyFor(s,q.id)]={...m.emptyResult(),done:true,points:q.mode==='localizar'?1:2};assert.equal(m.score(s,0),76);assert.equal(m.score(s,1),0);assert.equal(m.score(s,'solo'),0);assert.equal(JSON.stringify(m.restore(JSON.stringify(s))),JSON.stringify(s));for(const raw of ['bad','null','[]','{"version":4}',JSON.stringify({...s,team:99}),JSON.stringify({...s,results:{'0:l1':{points:Infinity}}})])assert.equal(m.restore(raw).mode,'explorar');
-console.log('PASS: 32 fichas, 42 preguntas, 6 ejercicios; referencias, coordenadas, rúbricas, puntuación, no duplicación, ayudas, equipos y restauración.');
+const s=m.fresh();for(const q of c.questions)s.results[m.keyFor(s,q.id)]={...m.emptyResult(),done:true,points:q.mode==='localizar'?1:2};assert.equal(m.score(s,0),88);assert.equal(m.score(s,1),0);assert.equal(m.score(s,'solo'),0);assert.equal(JSON.stringify(m.restore(JSON.stringify(s))),JSON.stringify(s));for(const raw of ['bad','null','[]','{"version":4}',JSON.stringify({...s,team:99}),JSON.stringify({...s,results:{'0:l1':{points:Infinity}}})])assert.equal(m.restore(raw).mode,'explorar');
+console.log('PASS: 32 fichas, 48 preguntas, 6 ejercicios; referencias, coordenadas, rúbricas, puntuación, no duplicación, ayudas, equipos y restauración.');
 
 const w=moduleFrom('app/workshop-content.ts');
 const placed=w.placeMuscle(w.emptyPlacement(),'a','quad','biceps');
@@ -47,7 +47,7 @@ for(const p of Object.values(pc.planeDefinitions)){
  assert.equal(dot(p.normal,p.u),0);assert.equal(dot(p.normal,p.v),0);assert.equal(dot(p.u,p.v),0);
  assert.equal(norm(p.normal),1);
 }
-for(const joint of ['hip','shoulder'])for(const motion of pc.planeMotions){
+for(const joint of Object.keys(pc.jointNames))for(const motion of pc.jointMotions[joint].map(id=>pc.planeMotions.find(x=>x.id===id))){
  const origin=pc.jointOrigin(joint),normal=pc.planeDefinitions[motion.plane].normal;
  let lengths;
  for(let t=0;t<=100;t+=5){
@@ -63,6 +63,15 @@ for(const joint of ['hip','shoulder'])for(const motion of pc.planeMotions){
 }
 assert.ok(pc.movingLimb('hip','ir',100)[2][0]>pc.jointOrigin('hip')[0],'Con rodilla flexionada, RI desplaza el pie hacia fuera');
 assert.ok(pc.movingLimb('shoulder','ir',100)[2][0]<pc.jointOrigin('shoulder')[0],'RI lleva la mano hacia medial');
+// Codo, rodilla y tobillo: sentido de cada movimiento y recorridos orientativos
+assert.ok(pc.movingLimb('elbow','flex',50)[1][2]>0,'La flexión de codo lleva el antebrazo hacia delante');
+assert.ok(pc.movingLimb('knee','flex',50)[1][2]<0,'La flexión de rodilla lleva la pierna hacia atrás');
+assert.ok(pc.movingLimb('ankle','df',100)[1][1]>pc.jointOrigin('ankle')[1],'La flexión dorsal sube la punta del pie');
+assert.ok(pc.movingLimb('ankle','pf',100)[1][1]<pc.jointOrigin('ankle')[1],'La flexión plantar baja la punta del pie');
+assert.equal(JSON.stringify([pc.motionRange('elbow','flex'),pc.motionRange('knee','flex'),pc.motionRange('ankle','df'),pc.motionRange('ankle','pf')]),'[[0,145],[0,135],[0,20],[0,-50]]');
+assert.equal(JSON.stringify(pc.motionRange('hip','flex')),'[0,50]','Cadera y hombro conservan sus recorridos');
+for(const id of ['plane-elbow-flex','plane-elbow-ext','plane-knee-flex','plane-knee-ext','plane-ankle-df','plane-ankle-pf']){const q=c.questions.find(x=>x.id===id);assert.ok(q&&q.correct===1,'Pregunta nueva en plano sagital: '+id);}
+assert.ok(c.questions.find(x=>x.id==='plane-knee-flex').why.includes('casi no puede rotar'),'Matiz de la rotación de rodilla');
 const previous={...m.fresh(),results:{'0:r1':{...m.emptyResult(),done:true,points:2}}};
 assert.equal(m.restore(JSON.stringify(previous)).results['0:r1'].points,2,'La ampliación conserva resultados previos');
-console.log('PASS: tres planos y ejes ortogonales; doce gestos planos, longitudes constantes, rotaciones coherentes y conservación del progreso anterior.');
+console.log('PASS: tres planos y ejes ortogonales; dieciocho gestos en cinco articulaciones, longitudes constantes, rotaciones coherentes y conservación del progreso anterior.');
