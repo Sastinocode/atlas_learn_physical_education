@@ -1,5 +1,4 @@
 /* Core lab + timed classroom game. All states carry text/symbols as well as colour. */
-.mode-tabs{height:auto!important;flex-wrap:wrap!important}.mode-tab{min-width:126px;flex:1 1 126px}
 .core-lab,.core-game{background:#fff;border:1px solid #ded6e8;border-radius:18px;padding:clamp(16px,3vw,36px);scroll-margin-top:20px;color:#272038}
 .core-heading{display:flex;align-items:center;justify-content:space-between;gap:28px;margin-bottom:24px}.core-heading h2{font-size:clamp(1.65rem,3vw,2.6rem);font-weight:750;line-height:1.12;margin:12px 0}.core-heading p{max-width:720px;line-height:1.6;color:#655a70}.core-heading>.primary{flex-shrink:0}
 .core-tabs,.core-select{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0}.core-tabs button,.core-select button,.core-rating button{border:1px solid #d6c9e7;border-radius:9px;background:#fff;color:#544364;padding:12px 16px;min-height:46px}.core-tabs button[aria-pressed=true],.core-select button[aria-pressed=true],.core-rating button[aria-pressed=true]{background:#ede5fa;border-color:#7752b0;box-shadow:inset 0 -3px #7752b0;color:#492474;font-weight:650}
