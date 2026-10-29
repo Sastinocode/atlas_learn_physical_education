@@ -68,3 +68,24 @@
 .challenge-game select{display:block;width:100%;padding:12px;margin:8px 0 20px;border:1px solid #bfb2df;border-radius:10px;background:white;color:#29223a}
 .challenge-game .game-arena h3{font-size:clamp(22px,2.5vw,32px);line-height:1.4}.challenge-game .notice{margin:20px 0;padding:24px}.challenge-game .notice p{font-size:18px;line-height:1.6}.challenge-diagram{max-width:650px;margin:20px auto}.challenge-diagram svg{width:100%;background:#faf8ff;border-radius:16px}.challenge-diagram figcaption{font-size:15px;line-height:1.5}.challenge-game details{margin-top:28px}.mode-tabs{flex-wrap:wrap;height:auto}
 .mechanics{background:#fff;border:1px solid #ded9e9;border-radius:24px;padding:clamp(18px,3vw,40px);color:#21374a}.lesson-header h2{font-size:clamp(30px,4vw,46px);margin:10px 0}.lesson-header p,.mechanics p,.mechanics li{font-size:18px;line-height:1.65}.lesson-tabs,.lesson-toggle{display:flex;flex-wrap:wrap;gap:16px;margin:24px 0}.lesson-cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px;margin:24px 0}.lesson-card{text-align:left;border:2px solid #e1e7ee;border-radius:20px;padding:20px;background:linear-gradient(#f7fafc,#fff);color:#21374a;min-width:0}.lesson-card.selected{border-color:#6442b6;box-shadow:0 0 0 3px #ede7fa}.lesson-card h3{font-size:23px;margin:0}.lesson-card svg{display:block;width:100%;height:auto}.lesson-card b,.lesson-card span{display:block;margin-top:10px}.lesson-card b{font-size:20px}.lesson-card span{font-size:17px}.lesson-concepts{display:flex;flex-wrap:wrap;gap:18px;margin:24px 0}.lesson-concepts article{flex:1 1 260px;background:#f1f6fa;padding:24px;border-radius:18px}.lesson-concepts h3,.lesson-explanation h3{font-size:24px;margin:10px 0}.lesson-explanation{background:#f4effc;border-left:5px solid #7450b1;border-radius:12px;padding:25px;margin:25px 0}.lesson-toggle label{padding:12px;background:#eef3f8;border-radius:10px;font-size:17px}.mechanics input[type=checkbox]{width:20px;height:20px;vertical-align:middle}.mechanics input[type=range]{display:block;width:100%;margin:20px 0}.mechanics .moment-result{font-size:32px;font-weight:800;color:#603da4}.lesson-sources{margin-top:30px}.lesson-card:focus-visible{outline:4px solid #2c6c99;outline-offset:4px}@media(max-width:720px){.lesson-cards{grid-template-columns:1fr}.lesson-card svg{max-height:340px}.lesson-card h3{font-size:24px}}
+
+/* Menú de modos agrupado: Aprender / Practicar / Jugar */
+.mode-nav{display:flex;flex-wrap:wrap;gap:10px;width:100%;height:auto;background:#eeedf2;border:1px solid #e5e2ec;border-radius:13px;padding:8px;justify-content:stretch}
+.mode-group{flex:1 1 300px;display:flex;flex-direction:column;gap:4px;min-width:0}
+.mode-group-label{font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;font-weight:700;color:#5b4a7a;padding:2px 8px}
+.mode-group-tabs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:4px}
+.mode-chip{display:flex;align-items:center;justify-content:flex-start;gap:10px;min-height:52px;padding:8px 12px;border:0;border-radius:9px;background:transparent;color:#5f5870;font:inherit;text-align:left;cursor:pointer}
+.mode-chip:hover{background:#f6f5f9}
+.mode-chip[data-active]{background:#fff;color:var(--primary);box-shadow:0 2px 6px #28203c14}
+.mode-chip:focus-visible{outline:2px solid var(--primary);outline-offset:2px}
+.mode-chip span{font-size:.95rem;font-weight:600;line-height:1.25}
+.mode-chip small{display:block;font-size:.78rem;font-weight:400;color:#6b6477;margin-top:2px}
+@media(max-width:650px){
+.intro{display:none}
+.mode-nav{flex-wrap:nowrap;overflow-x:auto;gap:14px;padding:6px;margin-top:4px;scrollbar-width:thin}
+.mode-group{flex:0 0 auto;flex-direction:row;align-items:center;gap:6px}
+.mode-group-label{padding:0 2px;writing-mode:horizontal-tb}
+.mode-group-tabs{display:flex;gap:4px}
+.mode-chip{min-height:44px;padding:6px 12px;white-space:nowrap}
+.mode-chip small{display:none}
+}
