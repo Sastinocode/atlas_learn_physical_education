@@ -1,5 +1,6 @@
 const CACHE='atlas-__BUILD__';
-const SHELL=['./','./index.html','./atlas.js','./atlas3d.js','./mannequin.js','./atlas.css','./favicon.svg','./icon-192.png','./icon-512.png','./manifest.webmanifest'];
+// El modelo 3D (atlas3d.js, ~5,7 MB) no se precarga: se guarda al abrir Atlas 3D por primera vez (ver fetch)
+const SHELL=['./','./index.html','./atlas.js','./mannequin.js','./atlas.css','./favicon.svg','./icon-192.png','./icon-512.png','./manifest.webmanifest'];
 self.addEventListener('install',e=>{e.waitUntil(caches.open(CACHE).then(c=>c.addAll(SHELL.map(u=>new Request(u,{cache:'reload'})))).then(()=>self.skipWaiting()));});
 self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k.startsWith('atlas-')&&k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim()));});
 self.addEventListener('fetch',e=>{

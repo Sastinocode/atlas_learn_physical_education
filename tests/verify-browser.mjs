@@ -195,7 +195,22 @@ for(const vp of viewports){
  if(a!==b)fail('reducir movimiento',`el maniquí sigue animándose (${a} → ${b})`);else console.log(`  ✓ reducir movimiento · maniquí quieto en ${a}`);
  await ctx.close();
 }
+{
+ // App instalable: el modelo 3D no se guarda hasta que se abre Atlas 3D
+ const ctx=await browser.newContext({viewport:{width:1280,height:800}});const pg=await ctx.newPage();
+ await pg.goto(url);await pg.evaluate(()=>navigator.serviceWorker.ready);await pg.waitForTimeout(1500);
+ const cached=()=>pg.evaluate(async()=>{const out=[];for(const k of await caches.keys())for(const r of await (await caches.open(k)).keys())out.push(new URL(r.url).pathname);return out;});
+ const before=await cached();
+ if(!before.includes('/atlas.js'))fail('app instalable','no se ha guardado la app para usarla sin conexión');
+ else if(before.includes('/atlas3d.js'))fail('app instalable','el modelo 3D se descarga antes de usarlo');
+ await pg.getByRole('button',{name:/Abrir el atlas/}).click();await pg.locator('.mode-nav .mode-chip',{hasText:'Atlas 3D'}).click();
+ await pg.waitForFunction(()=>document.querySelector('.three-canvas canvas')&&!document.querySelector('.three-loading'),null,{timeout:60000});await pg.waitForTimeout(1000);
+ const after=await cached();
+ if(!after.includes('/atlas3d.js'))fail('app instalable','tras abrir Atlas 3D el modelo no queda guardado para usarlo sin conexión');
+ else console.log('  ✓ app instalable · el 3D se guarda solo al usarlo');
+ await ctx.close();
+}
 await browser.close();
 server.close();
 if(failures.length){console.error(`\nFALLO: ${failures.length} problema(s) en el navegador.`);process.exit(1);}
-console.log('PASS navegador: 11 modos, laboratorio de codo, rodilla y tobillo, ejercicios en 3D, core en estabilidad, repaso rápido, exportación a Excel y visor 3D con teclado en escritorio y móvil sin errores (maniquí en Lecciones y Core; el 3D anatómico solo se carga al entrar), y guardado/recuperación de progreso.');
+console.log('PASS navegador: 11 modos, laboratorio de codo, rodilla y tobillo, ejercicios en 3D, core en estabilidad, repaso rápido, exportación a Excel, visor 3D con teclado y 3D guardado solo al usarlo, en escritorio y móvil sin errores (maniquí en Lecciones y Core; el 3D anatómico solo se carga al entrar), y guardado/recuperación de progreso.');
