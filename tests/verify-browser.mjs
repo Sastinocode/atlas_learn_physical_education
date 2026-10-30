@@ -116,6 +116,20 @@ for(const vp of viewports){
   }else{await page.keyboard.press('Escape');await page.waitForTimeout(300);}
  }
 
+ // Core · transmisión y estabilidad en 3D: tres casos, etiquetas de algunos pasos
+ where=`${vp.name} · core transmisión y estabilidad`;
+ await page.locator('.mode-nav .mode-chip',{hasText:'Core'}).click();
+ await page.getByRole('button',{name:/Transmisión y estabilidad/}).click();
+ try{await page.locator('.stability3d canvas').first().waitFor({timeout:20000});}catch{fail(where,'no aparece el 3D de la pestaña');}
+ for(const [name,stepIndex,text] of [['Empuje de pie',3,'Empuje sobre la caja'],['Carga unilateral',0,'Peso de la maleta'],['Plancha de antebrazos',2,'Trabajo isométrico']]){
+  await page.getByRole('button',{name,exact:true}).click();
+  await page.locator('.core-chain > button').nth(stepIndex).click();
+  // El 3D se pausa fuera de pantalla: se vuelve a mostrar antes de leer sus etiquetas
+  await page.locator('.stability3d').scrollIntoViewIfNeeded();await page.waitForTimeout(500);
+  const shown=await page.locator('.stability-tag').allInnerTexts();
+  if(!shown.some(t=>t.includes(text)))fail(where,`${name}, paso ${stepIndex+1}: falta «${text}» (se ve: ${shown.join(' | ')})`);else console.log(`  ✓ ${where} · ${name} paso ${stepIndex+1}`);
+ }
+
  // Repaso rápido y exportación de resultados (CSV para Excel)
  where=`${vp.name} · repaso rápido`;
  await page.locator('.mode-nav .mode-chip',{hasText:'Relacionar'}).click();
@@ -159,4 +173,4 @@ for(const vp of viewports){
 await browser.close();
 server.close();
 if(failures.length){console.error(`\nFALLO: ${failures.length} problema(s) en el navegador.`);process.exit(1);}
-console.log('PASS navegador: 11 modos, laboratorio de codo, rodilla y tobillo, ejercicios en 3D, repaso rápido y exportación a Excel en escritorio y móvil sin errores (maniquí en Lecciones y Core; el 3D anatómico solo se carga al entrar), y guardado/recuperación de progreso.');
+console.log('PASS navegador: 11 modos, laboratorio de codo, rodilla y tobillo, ejercicios en 3D, core en estabilidad, repaso rápido y exportación a Excel en escritorio y móvil sin errores (maniquí en Lecciones y Core; el 3D anatómico solo se carga al entrar), y guardado/recuperación de progreso.');
