@@ -1,7 +1,7 @@
 import {useEffect,useId,useState} from 'react';
 import {Play,Pause,RotateCcw,ArrowRight} from 'lucide-react';
 import Mannequin3D from './mannequin/lazy';
-import {add3,scale3,jointOrigin,movingLimb,planeDefinitions,planeMotions,jointNames,jointMotions,describeMotion,motionDescription,type V3,type JointId,type MotionId} from './planes-content';
+import {add3,scale3,jointOrigin,movingLimb,planeDefinitions,planeMotions,jointNames,jointMotions,describeMotion,motionDescription,motionRange,type V3,type JointId,type MotionId} from './planes-content';
 type Camera='oblique'|'front'|'side'|'top';
 function PlaneScene({joint,motion,progress,camera,planeVisible,axisVisible}:{joint:JointId;motion:MotionId;progress:number;camera:Camera;planeVisible:boolean;axisVisible:boolean}){
  const uid=useId().replaceAll(':',''),m=planeMotions.find(x=>x.id===motion)!,d=planeDefinitions[m.plane];
@@ -55,7 +55,7 @@ export default function PlanesLab({onQuestion}:{onQuestion:(id:string)=>void}){
   <div className="planes-grid"><div className="planes-visual"><div className="planes-camera" aria-label="Vista del esquema">{([['oblique','Oblicua'],['front','Frontal'],['side','Lateral'],['top','Superior']] as const).map(([v,label])=><button key={v} aria-pressed={camera===v} onClick={()=>setCamera(v)}>{label}</button>)}</div><Mannequin3D joint={joint} motion={motion} progress={progress} camera={camera} showPlane={planeVisible} showAxis={axisVisible} fallback={<PlaneScene joint={joint} motion={motion} progress={progress} camera={camera} planeVisible={planeVisible} axisVisible={axisVisible}/>}/>
    <div className="planes-toggles"><label><input type="checkbox" checked={planeVisible} onChange={e=>setPlaneVisible(e.target.checked)}/> P · mostrar plano</label><label><input type="checkbox" checked={axisVisible} onChange={e=>setAxisVisible(e.target.checked)}/> E · mostrar eje</label></div>
    <div className="lab-transport"><button className="primary" onClick={()=>{if(progress===100)setProgress(0);setPlaying(p=>!p);}}>{playing?<Pause size={17}/>:<Play size={17}/>} {playing?'Pausar gesto':'Reproducir gesto'}</button><button className="secondary" onClick={resetMotion}>Volver al inicio</button></div>
-   <label className="lab-slider">Recorrido del gesto · {Math.round(progress)} %<input type="range" min="0" max="100" step="1" value={progress} aria-label="Recorrido del movimiento articular" onChange={e=>{setPlaying(false);setProgress(Number(e.target.value));}}/></label>
+   <label className="lab-slider">Recorrido del gesto · {Math.round(progress)} %<input type="range" min="0" max="100" step="1" value={progress} aria-label="Recorrido del movimiento articular" aria-valuetext={`${Math.round(progress)} %: ${Math.round(Math.abs(motionRange(joint,motion)[0]+(motionRange(joint,motion)[1]-motionRange(joint,motion)[0])*progress/100))}° de ${m.name.toLowerCase()} de ${jointNames[joint].toLowerCase()}`} onChange={e=>{setPlaying(false);setProgress(Number(e.target.value));}}/></label>
    <p className="lab-caption">La cámara cambia la vista, no el plano anatómico. Si el plano se ve de canto o el eje como un punto, prueba «Oblicua». Los 90° reales no siempre se ven como 90° en una proyección.</p>
   </div><div className="planes-reading"><div><span className="pill">{jointNames[joint]} derecha · {m.short}</span><h3>{m.name}</h3><p>{describeMotion(joint,motion)}</p><p>{motionDescription(joint,motion)}</p></div>
    <button className="secondary" aria-expanded={explanation} onClick={()=>setExplanation(v=>!v)}>{explanation?'Ocultar':'Revelar'} plano, eje y explicación</button>

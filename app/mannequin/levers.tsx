@@ -3,7 +3,7 @@
 // A (apoyo, punto negro), F (fuerza muscular, flecha carmín) y R (resistencia, flecha sepia).
 import {useEffect,useRef,useState} from 'react';
 import * as T from 'three';
-import {COLOR,buildBody,createStage,forceArrow,toScreen} from './body';
+import {COLOR,buildBody,createStage,forceArrow,toScreen,reducedMotion} from './body';
 import {levers} from '../levers-content';
 
 export type LeverProps={index:number;labels:boolean;compact?:boolean};
@@ -45,7 +45,7 @@ export default function LeverMannequin({index,labels,compact=false}:LeverProps){
   stageApi.loop(now=>{
    const {index,labels}=live.current;
    if(index!==lastIndex){stageApi.lookFrom(VIEWS[index][0],VIEWS[index][1]);lastIndex=index;}
-   const t=(1-Math.cos(((now-start)/1500)*Math.PI))/2; // 0→1→0
+   const t=reducedMotion()?.5:(1-Math.cos(((now-start)/1500)*Math.PI))/2; // 0→1→0 (quieto a media fase si se reduce el movimiento)
    // Postura neutra
    head.rotation.set(0,0,0);root.position.y=0;arm.mid.rotation.set(0,0,0);
    for(const leg of [legR,legL])leg.end.rotation.set(0,0,0);

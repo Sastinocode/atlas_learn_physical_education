@@ -180,3 +180,7 @@ input[type="checkbox"],input[type="radio"],input[type="range"]{accent-color:var(
 .stability3d .mannequin-stage{aspect-ratio:16/9;max-height:520px}
 .stability-tag{position:absolute;left:0;top:0;z-index:3;pointer-events:none;font-size:.85rem;font-weight:600;color:var(--ink);background:#fffdf8ee;border:1.5px solid #c98a2c;border-radius:4px;padding:3px 8px;white-space:nowrap}
 @media(max-width:600px){.stability3d .mannequin-stage{aspect-ratio:4/3.4}}
+
+/* ===== Accesibilidad del visor 3D ===== */
+.three-canvas canvas:focus-visible{outline:3px solid #9a6212;outline-offset:-3px}
+.keyboard-help kbd{font-family:inherit;font-size:.8rem;border:1px solid var(--border);border-bottom-width:2px;border-radius:4px;padding:0 5px;background:#fffdf8}

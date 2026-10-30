@@ -5,7 +5,7 @@
 // Las flechas indican dirección, no magnitud.
 import {useEffect,useRef,useState} from 'react';
 import * as T from 'three';
-import {COLOR,buildBody,createStage,forceArrow,toScreen} from './body';
+import {COLOR,buildBody,createStage,forceArrow,toScreen,reducedMotion} from './body';
 
 export type StabilityCase='push'|'carry'|'plank';
 export type StabilityProps={caseId:StabilityCase;step:number};
@@ -64,7 +64,7 @@ export default function StabilityMannequin({caseId,step}:StabilityProps){
   const fitPlank=()=>{let best=0,err=Infinity;for(let a=0;a<=20;a+=.25){plankPose(a);const e=Math.abs(plankGap());if(e<err){err=e;best=a;}}plankTilt=best;};
   const start=performance.now();
   stageApi.loop(now=>{
-   const {caseId,step}=live.current,t=(now-start)/1000;
+   const {caseId,step}=live.current,t=reducedMotion()?0:(now-start)/1000;
    if(caseId!==lastCase){stageApi.lookFrom(...VIEWS[caseId]);lastCase=caseId;if(caseId==='plank'){for(const l of Object.values(L)){l.root.rotation.set(0,0,0);l.mid.rotation.set(0,0,0);l.end.rotation.set(0,0,0);}fitPlank();}}
    // Postura base
    root.rotation.set(0,0,0);root.position.set(0,0,0);

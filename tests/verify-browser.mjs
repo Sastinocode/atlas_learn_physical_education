@@ -130,6 +130,22 @@ for(const vp of viewports){
   if(!shown.some(t=>t.includes(text)))fail(where,`${name}, paso ${stepIndex+1}: falta «${text}» (se ve: ${shown.join(' | ')})`);else console.log(`  ✓ ${where} · ${name} paso ${stepIndex+1}`);
  }
 
+ // Visor 3D solo con teclado: enfocar, girar, volver de frente y elegir desde la lista
+ where=`${vp.name} · visor 3D con teclado`;
+ await page.locator('.mode-nav .mode-chip',{hasText:'Atlas 3D'}).click();
+ await page.waitForFunction(()=>document.querySelector('.three-canvas canvas')&&!document.querySelector('.three-loading'),null,{timeout:60000}).catch(()=>fail(where,'el modelo no termina de cargar'));
+ const canvas3d=page.locator('.three-canvas canvas');
+ await canvas3d.focus();
+ if(!(await canvas3d.evaluate(el=>el===document.activeElement)))fail(where,'el modelo no recibe el foco');
+ await page.keyboard.press('ArrowRight');await page.keyboard.press('ArrowRight');
+ const angle1=await canvas3d.getAttribute('data-azimuth');await page.keyboard.press('ArrowRight');const angle2=await canvas3d.getAttribute('data-azimuth');
+ if(angle1===null||angle1===angle2)fail(where,`las flechas no giran el modelo (${angle1} → ${angle2})`);
+ await page.keyboard.press('Home');await page.waitForTimeout(300);
+ if(!(await page.locator('.three-announce').innerText()).includes('Vista anterior'))fail(where,'Inicio no anuncia la vista de frente');
+ const item=page.locator('.three-list button',{hasText:'Deltoides'});await item.focus();await page.keyboard.press('Enter');await page.waitForTimeout(300);
+ const said=await page.locator('.three-announce').innerText();
+ if(!said.startsWith('Deltoides seleccionado.'))fail(where,`no se anuncia la estructura elegida (${said})`);else console.log(`  ✓ ${where} · giro, Inicio y «${said.slice(0,40)}…»`);
+
  // Repaso rápido y exportación de resultados (CSV para Excel)
  where=`${vp.name} · repaso rápido`;
  await page.locator('.mode-nav .mode-chip',{hasText:'Relacionar'}).click();
@@ -170,7 +186,16 @@ for(const vp of viewports){
  await rm(dir,{recursive:true,force:true});
  await context.close();
 }
+{
+ const ctx=await browser.newContext({viewport:{width:1280,height:800},reducedMotion:'reduce',serviceWorkers:'block'});const pg=await ctx.newPage();
+ await pg.goto(url);await pg.getByRole('button',{name:/Abrir el atlas/}).click();
+ await pg.locator('.mode-nav .mode-chip',{hasText:'Lecciones'}).click();
+ await pg.locator('.lesson-stage .mannequin canvas').first().waitFor({timeout:20000});await pg.waitForTimeout(800);
+ const a=await pg.locator('.lesson-stage .mannequin-angle').innerText();await pg.waitForTimeout(900);const b=await pg.locator('.lesson-stage .mannequin-angle').innerText();
+ if(a!==b)fail('reducir movimiento',`el maniquí sigue animándose (${a} → ${b})`);else console.log(`  ✓ reducir movimiento · maniquí quieto en ${a}`);
+ await ctx.close();
+}
 await browser.close();
 server.close();
 if(failures.length){console.error(`\nFALLO: ${failures.length} problema(s) en el navegador.`);process.exit(1);}
-console.log('PASS navegador: 11 modos, laboratorio de codo, rodilla y tobillo, ejercicios en 3D, core en estabilidad, repaso rápido y exportación a Excel en escritorio y móvil sin errores (maniquí en Lecciones y Core; el 3D anatómico solo se carga al entrar), y guardado/recuperación de progreso.');
+console.log('PASS navegador: 11 modos, laboratorio de codo, rodilla y tobillo, ejercicios en 3D, core en estabilidad, repaso rápido, exportación a Excel y visor 3D con teclado en escritorio y móvil sin errores (maniquí en Lecciones y Core; el 3D anatómico solo se carga al entrar), y guardado/recuperación de progreso.');

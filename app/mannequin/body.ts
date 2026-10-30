@@ -7,6 +7,8 @@ import {OrbitControls} from 'three/examples/jsm/controls/OrbitControls.js';
 export const COLOR={paper:'#f8f3e9',body:'#e6dac2',moving:'#b9775a',joint:'#7a5a44',ink:'#3a2f25',ground:'#ece2cf',muscle:'#a8423a',load:'#6b5f50'};
 export const HEAD_PIVOT_Y=157,SHOULDER_Y=143,HIP_Y=90,UPPER_ARM=31,FOREARM=28,THIGH=42,SHANK=40;
 
+// Preferencia del sistema «reducir movimiento»: los maniquíes no se animan solos
+export const reducedMotion=()=>typeof matchMedia!=='undefined'&&matchMedia('(prefers-reduced-motion: reduce)').matches;
 export type Limb={root:T.Group;mid:T.Group;end:T.Group;meshes:T.Mesh[]};
 
 export function buildBody(scene:T.Scene){

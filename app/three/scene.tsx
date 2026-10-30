@@ -9,14 +9,15 @@ import {PointerTap} from './pointer-tap';
 import {opacityFor,renderRatio,createDemandLoop} from './display-options';
 import {SYSTEMS,type Atlas,type SceneState} from './anatomy';
 export type NameTag={id:string;name:string;elements:string[]};
-interface Props {atlas:Atlas;state:SceneState;onSelect:(id:string)=>void;onProgress:(n:number)=>void;onError:(s:string)=>void;label?:string;labels?:NameTag[]|null}
-export default function AnatomyScene({atlas,state,onSelect,onProgress,onError,label,labels}:Props){
+interface Props {atlas:Atlas;state:SceneState;onSelect:(id:string)=>void;onProgress:(n:number)=>void;onError:(s:string)=>void;label?:string;labels?:NameTag[]|null;onHome?:()=>void}
+export default function AnatomyScene({atlas,state,onSelect,onProgress,onError,label,labels,onHome}:Props){
  const invalidateRef=useRef<()=>void>(()=>{});
  useEffect(()=>invalidateRef.current(),[state]);
  const names=useRef({label,labels});names.current={label,labels};
  useEffect(()=>invalidateRef.current(),[label,labels]);
  const host=useRef<HTMLDivElement>(null),latest=useRef(state),select=useRef(onSelect);
  latest.current=state;select.current=onSelect;
+ const home=useRef(onHome);home.current=onHome;
  useEffect(()=>{
   const el=host.current!;let disposed=false,dirty=true,ready=false,lastView='',lastReset=-1,lastIsolate='',layoutKey='',amount=0;
   let lastState:SceneState|null=null;
@@ -29,7 +30,8 @@ export default function AnatomyScene({atlas,state,onSelect,onProgress,onError,la
   let renderer:T.WebGLRenderer;
   try{renderer=new T.WebGLRenderer({antialias:true,alpha:false,powerPreference:'high-performance'});}catch{onError('No se pudo iniciar WebGL. Puedes seguir utilizando el atlas 2D y el taller.');loop.dispose();document.removeEventListener('visibilitychange',invalidate);return;}
   renderer.setPixelRatio(Math.min(devicePixelRatio,innerWidth<768?1.5:2));renderer.setClearColor('#f6f0e4');renderer.outputColorSpace=T.SRGBColorSpace;renderer.toneMapping=T.ACESFilmicToneMapping;renderer.toneMappingExposure=1.12;el.appendChild(renderer.domElement);
-  renderer.domElement.setAttribute('aria-label','Anatomía 3D. Arrastra para girar, usa la rueda para acercar o selecciona una estructura desde la lista.');
+  renderer.domElement.tabIndex=0;renderer.domElement.setAttribute('role','img');
+  renderer.domElement.setAttribute('aria-label','Anatomía 3D. Con teclado: flechas para girar, más y menos para acercar, Inicio para volver de frente. Arrastra para girar, usa la rueda para acercar o selecciona una estructura desde la lista.');
   const scene=new T.Scene(),camera=new T.PerspectiveCamera(34,1,.005,100),controls=new OrbitControls(camera,renderer.domElement);
   camera.position.set(1.4,1.05,3.6);controls.target.set(0,.85,0);controls.enableDamping=true;controls.dampingFactor=.085;controls.minDistance=.07;controls.maxDistance=40;controls.maxPolarAngle=Math.PI*.96;controls.addEventListener('change',invalidate);
   const pmrem=new T.PMREMGenerator(renderer),room=new RoomEnvironment(),env=pmrem.fromScene(room,.04);scene.environment=env.texture;room.dispose();pmrem.dispose();
@@ -163,6 +165,21 @@ export default function AnatomyScene({atlas,state,onSelect,onProgress,onError,la
    pickers.forEach((mesh,i)=>{if(!mesh||opacityFor(latest.current.opacity,atlas.parts[i].system)<.15||data[i*4+3]<.5||(hasSolid&&atlas.parts[i].system==='integumentary'))return;worldBox.copy(bounds[i]).translate(mesh.position);if(!raycaster.ray.intersectBox(worldBox,hitPoint))return;const hits=raycaster.intersectObject(mesh,false);if(hits[0]&&hits[0].distance<nearest){nearest=hits[0].distance;found=i;}});
    if(found<0&&amount>.45)found=findTarget(e.clientX-rect.left,e.clientY-rect.top,e.pointerType==='touch'?24:16);if(found>=0){hover.hidden=true;select.current(atlas.parts[found].id);}
   };
+  // Teclado: flechas giran (Mayús = giro mayor), + y − acercan, Inicio vuelve a la vista de frente
+  const spherical=new T.Spherical(),offset=new T.Vector3();
+  const markAngle=()=>{spherical.setFromVector3(offset.copy(camera.position).sub(controls.target));renderer.domElement.dataset.azimuth=String(Math.round(T.MathUtils.radToDeg(spherical.theta)));};
+  const orbit=(dTheta:number,dPhi:number)=>{spherical.setFromVector3(offset.copy(camera.position).sub(controls.target));spherical.theta+=dTheta;spherical.phi=T.MathUtils.clamp(spherical.phi+dPhi,.15,Math.PI*.95);camera.position.copy(controls.target).add(offset.setFromSpherical(spherical));controls.update();markAngle();invalidate();};
+  const zoomBy=(factor:number)=>{offset.copy(camera.position).sub(controls.target);offset.setLength(T.MathUtils.clamp(offset.length()*factor,controls.minDistance,controls.maxDistance));camera.position.copy(controls.target).add(offset);controls.update();invalidate();};
+  const keydown=(e:KeyboardEvent)=>{
+   const step=e.shiftKey?Math.PI/4:Math.PI/12;
+   if(e.key==='ArrowLeft')orbit(-step,0);else if(e.key==='ArrowRight')orbit(step,0);
+   else if(e.key==='ArrowUp')orbit(0,-step/2);else if(e.key==='ArrowDown')orbit(0,step/2);
+   else if(e.key==='+'||e.key==='=')zoomBy(.85);else if(e.key==='-'||e.key==='_')zoomBy(1.18);
+   else if(e.key==='Home'){home.current?.();fit('front',amount);markAngle();invalidate();}
+   else return;
+   e.preventDefault();
+  };
+  renderer.domElement.addEventListener('keydown',keydown);
   renderer.domElement.addEventListener('pointerdown',down);renderer.domElement.addEventListener('pointermove',move);renderer.domElement.addEventListener('pointerup',up);renderer.domElement.addEventListener('pointercancel',cancel);
   const clock=new T.Clock();let lastExtent=-1;
   const animate=()=>{
@@ -202,7 +219,7 @@ export default function AnatomyScene({atlas,state,onSelect,onProgress,onError,la
    lastState=s;return moving||controls.autoRotate||controlsMoving;
   };draw=animate;invalidate();
   const contextLost=(e:Event)=>{e.preventDefault();onError('El dispositivo ha interrumpido WebGL. Recarga el visor o vuelve al atlas 2D.');};renderer.domElement.addEventListener('webglcontextlost',contextLost);
-  return()=>{disposed=true;abort.abort();loop.dispose();invalidateRef.current=()=>{};document.removeEventListener('visibilitychange',invalidate);observer.disconnect();controls.dispose();geometries.forEach(g=>g.dispose());materials.forEach(m=>m.dispose());scene.traverse(o=>{if(o instanceof T.Mesh&&!geometries.includes(o.geometry)){o.geometry.dispose();const ms=Array.isArray(o.material)?o.material:[o.material];ms.forEach(m=>m.dispose());}});env.dispose();partTexture.dispose();selectionTexture.dispose();markerGeometry.dispose();markerMaterial.dispose();hover.remove();leader.remove();tag.remove();nameLayer.remove();renderer.dispose();renderer.domElement.remove();};
+  return()=>{renderer.domElement.removeEventListener('keydown',keydown);disposed=true;abort.abort();loop.dispose();invalidateRef.current=()=>{};document.removeEventListener('visibilitychange',invalidate);observer.disconnect();controls.dispose();geometries.forEach(g=>g.dispose());materials.forEach(m=>m.dispose());scene.traverse(o=>{if(o instanceof T.Mesh&&!geometries.includes(o.geometry)){o.geometry.dispose();const ms=Array.isArray(o.material)?o.material:[o.material];ms.forEach(m=>m.dispose());}});env.dispose();partTexture.dispose();selectionTexture.dispose();markerGeometry.dispose();markerMaterial.dispose();hover.remove();leader.remove();tag.remove();nameLayer.remove();renderer.dispose();renderer.domElement.remove();};
  },[atlas]);
  return <div className="scene" ref={host}/>;
 }

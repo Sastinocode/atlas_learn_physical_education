@@ -1,5 +1,5 @@
 'use client';
-import {useEffect,useState} from 'react';
+import {useEffect,useRef,useState} from 'react';
 import AnatomyScene from './three/scene';
 import model from './three/model.json';
 import type {Atlas,SceneState,SystemId,View} from './three/anatomy';
@@ -17,6 +17,8 @@ export default function Atlas3D({onQuestion,focusId}:{onQuestion:(id:string)=>vo
  const [progress,setProgress]=useState(0),[error,setError]=useState(''),[ready,setReady]=useState(false),[saveError,setSaveError]=useState(false);
  const [query,setQuery]=useState(''),[retry,setRetry]=useState(0),[focus,setFocus]=useState(false),[showNames,setShowNames]=useState(false);
  useEffect(()=>{const exit=(e:KeyboardEvent)=>{if(e.key==='Escape')setFocus(false);};window.addEventListener('keydown',exit);return()=>window.removeEventListener('keydown',exit);},[]);
+ const [announce,setAnnounce]=useState('');
+ const firstView=useRef(true);
  const guide=model.learning.find(c=>c.elements.some(id=>state.selected.includes(id)));
  const selected=atlas.parts.find(p=>state.selected.includes(p.id));
  const original=structures.find(s=>s.id===guide?.id);
@@ -35,6 +37,11 @@ export default function Atlas3D({onQuestion,focusId}:{onQuestion:(id:string)=>vo
  // eslint-disable-next-line react-hooks/exhaustive-deps
  },[]);
  useEffect(()=>{if(ready)try{localStorage.setItem(THREE_STORAGE,JSON.stringify(state));}catch{setSaveError(true);}},[ready,state]);
+ // Avisos para lector de pantalla: estructura elegida y cambios de vista
+ useEffect(()=>{if(guide)setAnnounce(`${guide.name} seleccionado. ${ficha?.kind||'Tendón'}. Función: ${ficha?.fn||'transmite la fuerza del tríceps sural al calcáneo.'}`);
+ // eslint-disable-next-line react-hooks/exhaustive-deps
+ },[guide?.id]);
+ useEffect(()=>{if(firstView.current){firstView.current=false;return;}setAnnounce(`Vista ${({front:'anterior, de frente',back:'posterior',side:'lateral','three-quarter':'oblicua'} as Record<string,string>)[state.view]??state.view}.`);},[state.view,state.reset]);
  function commit(next:SceneState){setHistory(h=>[...h.slice(-19),state]);setState(next);}
  function select(id:string){const c=model.learning.find(x=>x.id===id||x.elements.includes(id));const part=atlas.parts.find(p=>p.id===(c?.elements[0]||id));const opacity=part&&opacityFor(state.opacity,part.system)<.15?{...state.opacity,[part.system]:1}:state.opacity;commit({...state,opacity,selected:c?c.elements:[id],isolate:false,explode:0,offset:[0,0,0],rotate:false});}
  function translate(axis:number,value:number){const offset=[...(state.offset||[0,0,0])] as [number,number,number];offset[axis]=value;commit({...state,offset,isolate:false});}
@@ -50,15 +57,17 @@ export default function Atlas3D({onQuestion,focusId}:{onQuestion:(id:string)=>vo
     <nav className="three-list" aria-label="Estructuras 3D">{available.map(c=><button key={c.id} className={guide?.id===c.id?'selected':''} aria-pressed={guide?.id===c.id} onClick={()=>select(c.id)}>{c.name}<small>{c.elements.length} piezas del modelo</small></button>)}{!available.length&&<p>No hay coincidencias en la selección docente.</p>}</nav>
    </aside>
    <div className="three-center"><div className="three-views" aria-label="Vistas del modelo">{(['front','back','side','three-quarter'] as View[]).map((v,i)=><button className="secondary" key={v} aria-pressed={state.view===v} onClick={()=>commit({...state,view:v,explode:0,reset:state.reset+1,rotate:false})}>{['Anterior','Posterior','Lateral','Oblicua'][i]}</button>)}</div>
-    <div className="three-canvas">{ready&&!error&&<AnatomyScene key={retry} atlas={atlas} state={state} onSelect={select} onProgress={setProgress} onError={setError} label={guide?.name||selected?.name} labels={showNames?model.learning:null}/>}
+    <div className="three-canvas">{ready&&!error&&<AnatomyScene key={retry} atlas={atlas} state={state} onSelect={select} onHome={()=>commit({...state,view:'front',explode:0,rotate:false,reset:state.reset+1})} onProgress={setProgress} onError={setError} label={guide?.name||selected?.name} labels={showNames?model.learning:null}/>}
      {progress<100&&!error&&<p className="three-loading" role="status">Preparando modelo 3D… {progress}%</p>}
      {error&&<div className="three-loading" role="alert"><p>{error}</p><button className="secondary" onClick={()=>{setError('');setProgress(0);setRetry(n=>n+1);}}>Reintentar carga</button><p>El atlas 2D y los retos siguen disponibles en las pestañas superiores.</p></div>}
     </div>
     <p className="small-note">Arrastra el cuerpo para girar y usa la rueda o el gesto de pinza para acercarte. También puedes seleccionar por nombre y cambiar de vista con los botones.</p>
+    <p className="small-note keyboard-help"><b>Con teclado:</b> pulsa Tab hasta el modelo; <kbd>←</kbd> <kbd>→</kbd> <kbd>↑</kbd> <kbd>↓</kbd> giran (con Mayús, más), <kbd>+</kbd> y <kbd>−</kbd> acercan, <kbd>Inicio</kbd> vuelve de frente. Elige estructuras en la lista con Tab e Intro.</p>
+    <p className="sr-only three-announce" aria-live="polite">{announce}</p>
     <label className="three-slider">Separar las piezas: {Math.round(state.explode*100)} %<input aria-label="Separar las piezas" type="range" min="0" max="100" value={Math.round(state.explode*100)} onChange={e=>commit({...state,explode:Number(e.target.value)/100,isolate:false,offset:[0,0,0],rotate:false})}/></label>
     <button className="secondary" disabled={!history.length} onClick={()=>{setState(history.at(-1)!);setHistory(history.slice(0,-1));}}>Deshacer cambio 3D</button>
    </div>
-   <aside className="three-detail" aria-live="polite"><div className="eyebrow">FICHA Y EXPERIMENTACIÓN</div><h2>{guide?.name||selected?.name||'Selecciona una estructura'}</h2>
+   <aside className="three-detail"><div className="eyebrow">FICHA Y EXPERIMENTACIÓN</div><h2>{guide?.name||selected?.name||'Selecciona una estructura'}</h2>
     {guide?<><span className="pill">{ficha?.kind||'Tendón'}</span><h3>Localización</h3><p>{ficha?.location||'Región posterior del tobillo; une el tríceps sural con el calcáneo.'}</p><h3>Función</h3><p>{ficha?.fn||'Transmite la fuerza del gastrocnemio y el sóleo al calcáneo; participa en la flexión plantar sin generar contracción muscular.'}</p><p className="notice">{ficha?.example||'Durante el ascenso de talones transmite la fuerza de los flexores plantares.'}</p>
     <button className="primary full" disabled={progress<100||!!error} onClick={()=>commit({...state,isolate:!state.isolate,explode:0,offset:[0,0,0],reset:state.reset+1})}>{state.isolate?'Ver en el cuerpo':'Aislar estructura'}</button>
     <h3>Desplazar la selección</h3><p className="small-note">Mueve sus piezas juntas para observar lo que hay debajo. Las flechas del teclado ajustan los controles.</p>{['Horizontal','Vertical','Profundidad'].map((label,i)=><label className="three-slider" key={label}>{label}<input aria-label={`Desplazamiento ${label.toLowerCase()}`} type="range" min="-.6" max=".6" step=".05" value={state.offset?.[i]||0} onChange={e=>translate(i,Number(e.target.value))}/></label>)}

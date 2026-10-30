@@ -4,7 +4,7 @@
 // Ejes del mundo: +y arriba, +z anterior, la derecha de la figura está en -x (la vemos a nuestra izquierda de frente).
 import {useEffect,useRef,useState} from 'react';
 import * as T from 'three';
-import {COLOR,UPPER_ARM,THIGH,buildBody,createStage} from './body';
+import {COLOR,UPPER_ARM,THIGH,buildBody,createStage,reducedMotion} from './body';
 import {planeDefinitions,planeMotions,jointNames,motionRange,type JointId,type MotionId,type PlaneId} from '../planes-content';
 
 export type MannequinCamera='oblique'|'front'|'side'|'top';
@@ -113,7 +113,8 @@ export default function Mannequin({joint,motion,progress=0,autoplay=false,camera
   const start=performance.now(),tmp=new T.Vector3();
   stageApi.loop(now=>{
    const {joint,motion,autoplay}=live.current;
-   const prog=autoplay?(1-Math.cos(((now-start)/1700)*Math.PI))/2*100:live.current.progress;
+   // Con «reducir movimiento» activado no se anima solo: queda en la posición final
+   const prog=autoplay?(reducedMotion()?100:(1-Math.cos(((now-start)/1700)*Math.PI))/2*100):live.current.progress;
    const a=angleAt(joint,motion,prog),rad=T.MathUtils.degToRad(a),moving=limbs[rig.limb+'R'][rig.group],ax=rotationOf(motion);
    moving.rotation.set(0,0,0);moving.rotation[ax]=rig.sign*rad;
    if(arcLine){
@@ -139,7 +140,8 @@ export default function Mannequin({joint,motion,progress=0,autoplay=false,camera
  useEffect(()=>{api.current?.setCamera(camera);},[camera]);
 
  if(failed)return <p className="notice" role="alert">Este navegador no puede mostrar el maniquí 3D (WebGL desactivado).</p>;
- const label=`Maniquí 3D: ${m.name.toLowerCase()} de ${jointNames[joint].toLowerCase()} derecha. Plano ${plane.name.toLowerCase()} y eje ${plane.axis.toLowerCase()}, perpendicular al plano.`;
+ const [from,to]=motionRange(joint,motion),now=Math.round(Math.abs(from+(to-from)*progress/100));
+ const label=`Maniquí 3D: ${m.name.toLowerCase()} de ${jointNames[joint].toLowerCase()} derecha. Plano ${plane.name.toLowerCase()} y eje ${plane.axis.toLowerCase()}, perpendicular al plano. ${autoplay?`El gesto se repite de ${Math.abs(from)}° a ${Math.abs(to)}°.`:`Ángulo actual: ${now}°.`}`;
  return <figure className={compact?'mannequin compact':'mannequin'} role="img" aria-label={label}>
   <div className="mannequin-stage" ref={stageRef}><span className="mannequin-angle" ref={labelRef} style={{color:PLANE_COLOR[m.plane]}}>0°</span></div>
   {!compact&&<figcaption className="mannequin-legend">
