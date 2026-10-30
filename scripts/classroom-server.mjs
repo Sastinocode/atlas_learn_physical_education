@@ -3,9 +3,18 @@ import {readFile} from 'node:fs/promises';
 import {randomBytes,randomInt} from 'node:crypto';
 import {networkInterfaces} from 'node:os';
 import {fileURLToPath} from 'node:url';
+import {resolve,extname,sep} from 'node:path';
 import {gameQuestions,SET_ID} from '../live/question-bank.mjs';
 import QRCode from 'qrcode';
 
+// Archivos de la app (dist-offline) que el ordenador del profesor puede pedir: todo lo de esa carpeta y nada de fuera
+const APP_DIR=fileURLToPath(new URL('../dist-offline/',import.meta.url));
+const APP_TYPES={'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.svg':'image/svg+xml','.png':'image/png','.webmanifest':'application/manifest+json','.md':'text/markdown; charset=utf-8','.txt':'text/plain; charset=utf-8'};
+function appAsset(pathname){
+ let file;try{file=resolve(APP_DIR,'.'+decodeURIComponent(pathname==='/'?'/index.html':pathname));}catch{return null;}
+ if(!file.startsWith(APP_DIR.endsWith(sep)?APP_DIR:APP_DIR+sep)||!APP_TYPES[extname(file)])return null;
+ return [file,APP_TYPES[extname(file)]];
+}
 const token=()=>randomBytes(24).toString('hex');
 const allowedTimes=[15,30,45,60,90,120,180];
 const local=req=>['127.0.0.1','::1','::ffff:127.0.0.1'].includes(req.socket.remoteAddress)&&/^(localhost|127\.0\.0\.1)(:\d+)?$/.test(req.headers.host||'')&&!req.headers['cf-connecting-ip']&&!req.headers['x-forwarded-for'];
@@ -90,9 +99,9 @@ export function createClassroomServer({now=Date.now,publicUrl=()=>'',online=fals
    if(req.method!=='GET')fail('Método no permitido.',405);
    if(!local(req)&&url.pathname==='/'){res.writeHead(302,{Location:'/live/'});return res.end();}
    if(!local(req)&&!url.pathname.startsWith('/live/'))fail('Página no disponible.',404);
-   const assets={'/live/':['../live/index.html','text/html; charset=utf-8'],'/live/app.js':['../live/app.js','text/javascript; charset=utf-8'],'/live/style.css':['../live/style.css','text/css'],'/':['../dist-offline/index.html','text/html; charset=utf-8'],'/atlas.js':['../dist-offline/atlas.js','text/javascript'],'/atlas.css':['../dist-offline/atlas.css','text/css']};
-   const asset=assets[url.pathname];if(!asset)fail('Página no disponible.',404);
-   let data=await readFile(new URL(asset[0],import.meta.url));
+   const assets={'/live/':['../live/index.html','text/html; charset=utf-8'],'/live/app.js':['../live/app.js','text/javascript; charset=utf-8'],'/live/style.css':['../live/style.css','text/css']};
+   const live=assets[url.pathname],asset=live?[fileURLToPath(new URL(live[0],import.meta.url)),live[1]]:appAsset(url.pathname);if(!asset)fail('Página no disponible.',404);
+   let data;try{data=await readFile(asset[0]);}catch{fail('Página no disponible.',404);}
    // Marca para que el Juego 10 sepa que hay aula en directo (sin ella no consulta /api/info)
    if(url.pathname==='/')data=Buffer.from(data.toString('utf8').replace('<head>','<head><meta name="aula-en-directo" content="1">'));res.writeHead(200,{'Content-Type':asset[1],'Cache-Control':'no-store','X-Content-Type-Options':'nosniff','Referrer-Policy':'no-referrer'});res.end(data);
   }catch(e){send({error:e.status?e.message:'No se ha podido completar la petición.'},e.status||500);}

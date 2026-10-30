@@ -7,6 +7,10 @@ async function call(path,{body,token,headers={}}={}){const r=await fetch(base+pa
 try{
  // La página que sirve el servidor del aula lleva la marca que activa la consulta del Juego 10
  assert.ok((await (await fetch(base+'/')).text()).includes('<meta name="aula-en-directo" content="1">'),'La página del aula lleva la marca');
+ // El ordenador del profesor recibe todos los archivos de la app (3D, maniquí, iconos, app instalable) y nada de fuera
+ for(const f of ['/atlas3d.js','/mannequin.js','/favicon.svg','/icon-192.png','/manifest.webmanifest','/sw.js','/credits/BodyParts3D.md'])assert.equal((await fetch(base+f)).status,200,'Entrega '+f);
+ for(const f of ['/../package.json','/%2e%2e/package.json','/no-existe.js'])assert.equal((await fetch(base+f)).status,404,'No entrega '+f);
+ assert.equal((await fetch(base+'/atlas3d.js',{headers:{'cf-connecting-ip':'1.2.3.4'}})).status,404,'Desde fuera solo se ve el aula');
  assert.equal((await call('/api/info',{headers:{'cf-connecting-ip':'1.2.3.4'}})).data.canHost,false);
  assert.equal((await call('/api/rooms',{body:{seconds:15},headers:{'cf-connecting-ip':'1.2.3.4'}})).status,403);
  assert.equal((await call('/api/rooms',{body:{seconds:15},headers:{Origin:'https://evil.example'}})).status,403);

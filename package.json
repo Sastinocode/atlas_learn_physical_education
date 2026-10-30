@@ -18,7 +18,7 @@
     "build:pages": "node build-offline.mjs",
     "preview:pages": "node scripts/preview-static.mjs",
     "test:browser": "node tests/verify-browser.mjs",
-    "check": "tsc --noEmit && node tests/verify.mjs && node tests/verify-challenges.mjs && node tests/verify-display-options.mjs && node tests/verify-3d.mjs && node tests/verify-sources.mjs"
+    "check": "tsc --noEmit && node tests/verify.mjs && node tests/verify-challenges.mjs && node tests/verify-display-options.mjs && node tests/verify-3d.mjs && node tests/verify-classroom.mjs && node tests/verify-sources.mjs"
   },
   "dependencies": {
     "@base-ui/react": "1.7.0",
