@@ -92,7 +92,9 @@ export function createClassroomServer({now=Date.now,publicUrl=()=>'',online=fals
    if(!local(req)&&!url.pathname.startsWith('/live/'))fail('Página no disponible.',404);
    const assets={'/live/':['../live/index.html','text/html; charset=utf-8'],'/live/app.js':['../live/app.js','text/javascript; charset=utf-8'],'/live/style.css':['../live/style.css','text/css'],'/':['../dist-offline/index.html','text/html; charset=utf-8'],'/atlas.js':['../dist-offline/atlas.js','text/javascript'],'/atlas.css':['../dist-offline/atlas.css','text/css']};
    const asset=assets[url.pathname];if(!asset)fail('Página no disponible.',404);
-   const data=await readFile(new URL(asset[0],import.meta.url));res.writeHead(200,{'Content-Type':asset[1],'Cache-Control':'no-store','X-Content-Type-Options':'nosniff','Referrer-Policy':'no-referrer'});res.end(data);
+   let data=await readFile(new URL(asset[0],import.meta.url));
+   // Marca para que el Juego 10 sepa que hay aula en directo (sin ella no consulta /api/info)
+   if(url.pathname==='/')data=Buffer.from(data.toString('utf8').replace('<head>','<head><meta name="aula-en-directo" content="1">'));res.writeHead(200,{'Content-Type':asset[1],'Cache-Control':'no-store','X-Content-Type-Options':'nosniff','Referrer-Policy':'no-referrer'});res.end(data);
   }catch(e){send({error:e.status?e.message:'No se ha podido completar la petición.'},e.status||500);}
  });
  const cleanup=setInterval(()=>{for(const [id,r] of rooms)if(now()-r.created>6*3600000)rooms.delete(id);},60000);cleanup.unref();server.on('close',()=>clearInterval(cleanup));

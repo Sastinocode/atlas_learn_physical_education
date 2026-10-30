@@ -5,6 +5,8 @@ await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));
 const base=`http://127.0.0.1:${server.address().port}`;
 async function call(path,{body,token,headers={}}={}){const r=await fetch(base+path,{method:body?'POST':'GET',headers:{'Content-Type':'application/json',...headers,...(token?{Authorization:`Bearer ${token}`}:{})},...(body?{body:JSON.stringify(body)}:{})});return {status:r.status,data:await r.json()};}
 try{
+ // La página que sirve el servidor del aula lleva la marca que activa la consulta del Juego 10
+ assert.ok((await (await fetch(base+'/')).text()).includes('<meta name="aula-en-directo" content="1">'),'La página del aula lleva la marca');
  assert.equal((await call('/api/info',{headers:{'cf-connecting-ip':'1.2.3.4'}})).data.canHost,false);
  assert.equal((await call('/api/rooms',{body:{seconds:15},headers:{'cf-connecting-ip':'1.2.3.4'}})).status,403);
  assert.equal((await call('/api/rooms',{body:{seconds:15},headers:{Origin:'https://evil.example'}})).status,403);

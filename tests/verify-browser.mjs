@@ -31,8 +31,6 @@ await new Promise(r=>server.listen(0,'127.0.0.1',r));
 const url=`http://127.0.0.1:${server.address().port}/`;
 
 const failures=[];
-// El modo Juego 10 consulta /api/info para ver si hay aula en directo; sin servidor de aula (como en Pages) da 404 y es normal.
-let ignoreInfo=false;
 const fail=(where,msg)=>{failures.push(`${where}: ${msg}`);console.error(`  ✗ ${where}: ${msg}`);};
 const browser=await chromium.launch({executablePath,headless:true,args:['--use-gl=swiftshader','--enable-unsafe-swiftshader']});
 
@@ -47,9 +45,9 @@ for(const vp of viewports){
  let loaded3d=false;
  page.on('request',r=>{if(r.url().endsWith('/atlas3d.js'))loaded3d=true;});
  page.on('pageerror',e=>fail(where,`error de la página: ${e.message}`));
- page.on('console',m=>{if(m.type()==='error'&&!(ignoreInfo&&/404/.test(m.text())))fail(where,`error en consola: ${m.text()}`);});
- page.on('requestfailed',r=>!r.url().endsWith('/api/info')&&fail(where,`no se pudo cargar ${r.url()}`));
- page.on('response',r=>{if(r.status()>=400&&!r.url().endsWith('/api/info'))fail(where,`respuesta ${r.status()} en ${r.url()}`);});
+ page.on('console',m=>{if(m.type()==='error')fail(where,`error en consola: ${m.text()}`);});
+ page.on('requestfailed',r=>fail(where,`no se pudo cargar ${r.url()}`));
+ page.on('response',r=>{if(r.status()>=400)fail(where,`respuesta ${r.status()} en ${r.url()}`);});
 
  await page.goto(url);
  await page.waitForSelector('.mode-nav .mode-chip');
@@ -62,7 +60,6 @@ for(const vp of viewports){
   const chip=chips.nth(i);
   const name=(await chip.innerText()).split('\n')[0].trim();
   where=`${vp.name} · modo ${name}`;
-  ignoreInfo=name==='Juego 10';
   await chip.click();
   await page.waitForTimeout(700);
   if(await chip.getAttribute('data-active')===null)fail(where,'el modo no queda activo al pulsarlo');
